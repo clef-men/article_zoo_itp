@@ -1,0 +1,39 @@
+\section{Related work}
+\label{sec:related}
+
+The idea of applying formal methods to verify \OCaml programs is not new.
+Generally speaking, there are mainly two ways:
+
+\paragraph{Semi-automated verification.}
+
+The verified program is annotated by the user to guide the verification tool: preconditions, postconditions, invariants, \etc.
+Given this input, the tool generates proof obligations that are mostly automatically discharged.
+One may further distinguish two types of semi-automated systems: \emph{foundational} and \emph{non-foundational}.
+
+In \emph{non-foundational} automated verification, the tool and the external solvers it may rely on are part of the trusted computing base.
+It is the most common approach and has been widely applied in the literature~\cite{DBLP:journals/jfp/SwamyCFSBY13, DBLP:series/natosec/0001SS17, DBLP:conf/nfm/JacobsSPVPP11, DBLP:conf/icfem/DenisJM22, DBLP:conf/nfm/AstrauskasBFGMM22, DBLP:conf/esop/FilliatreP13, DBLP:journals/pacmpl/LattuadaHCBSZHPH23, DBLP:journals/pacmpl/PulteMSMSK23}, including to \OCaml by \Cameleer~\cite{DBLP:conf/cav/PereiraR20}, which uses the \Gospel specification language~\cite{DBLP:conf/fm/ChargueraudFLP19} and \WhyThree~\cite{DBLP:conf/esop/FilliatreP13}.
+
+In \emph{foundational} automated verification, the proofs are checked by a proof assistant like \Rocq, meaning the automation does not have to be trusted.
+To our knowledge, it has been applied to \C~\cite{DBLP:conf/pldi/SammlerLKMD021} and \Rust~\cite{DBLP:journals/pacmpl/GaherSJKD24}.
+
+\paragraph{Non-automated verification.}
+
+The verified program is translated, manually or in an automated way, into a representation living inside a proof assistant.
+The user has to write specifications and prove them.
+
+The representation may be primitive, like Gallina for \Rocq.
+For pure programs, this is rather straightforward, \eg in \texttt{hs-to-coq}~\cite{DBLP:conf/cpp/Spector-Zabusky18}.
+For imperative programs, this is more challenging.
+One solution is to use a monad, \eg in \texttt{coq-of-ocaml}~\cite{coq-of-ocaml}, but it does not support concurrency.
+
+The representation may be embedded, meaning the semantics of the language is formalized in the proof assistant.
+This is the path taken by some recent works~\cite{DBLP:books/hal/Chargueraud23, DBLP:journals/pacmpl/GondelmanHPTB23, DBLP:conf/sosp/ChajedTKZ19} harnessing the power of separation logic, in particular the \Iris~\cite{DBLP:journals/jfp/JungKJBBD18} concurrent separation logic.
+\Iris is a very important work for the verification of concurrent algorithms.
+It allows for a rich, customizable ghost state that makes it possible to design complex \emph{concurrent protocols}.
+In our experience, for the lockfree algorithms we considered, there is simply no alternative.
+
+The tool closest to our needs so far is \CFML~\cite{DBLP:books/hal/Chargueraud23}, which targets \OCaml.
+However, \CFML does not support concurrency and is not based on \Iris.
+The \Osiris~\cite{osiris} framework, still under development, also targets \OCaml and is based on \Iris.
+However, it does not support concurrency and it is arguably non-trivial to introduce it since the semantics uses interaction trees~\cite{DBLP:journals/pacmpl/XiaZHHMPZ20}---the question of how to handle concurrency in this context is a research subject.
+Furthermore, \Osiris is not usable yet; its ambition to support a large fragment of \OCaml makes it a challenge.

@@ -1,0 +1,7 @@
+The release of \OCaml~5, which introduced parallelism into the language, drove the need for safe and efficient concurrent data structures.
+New libraries like \Saturn~\cite{saturn} aim at addressing this need.
+From the perspective of formal verification, this is an opportunity to apply and further state-of-the-art techniques to provide stronger guarantees.
+
+We present a framework for verifying fine-grained concurrent \OCaml~5 algorithms.
+Following a pragmatic approach, we support a limited but sufficient fragment of the language whose semantics has been carefully formalized to faithfully express such algorithms.
+Source programs are translated to a deeply-embedded language living inside \Rocq where they can be specified and verified using the \Iris~\cite{DBLP:journals/jfp/JungKJBBD18} concurrent separation logic.

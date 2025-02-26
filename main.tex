@@ -1,0 +1,118 @@
+\documentclass[acmsmall,screen,review,anonymous,nonacm]{acmart}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% ---------------------------------------------------------
+
+%% Journal information
+%% Supplied to authors by publisher for camera-ready submission;
+%% use defaults for review submission.
+\acmJournal{PACMPL}
+\acmVolume{1}
+\acmNumber{OOPSLA}
+\acmArticle{1}
+\acmYear{2025}
+\acmMonth{10}
+\acmDOI{} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
+\startPage{1}
+
+%% Copyright information
+%% Supplied to authors (based on authors' rights management selection;
+%% see authors.acm.org) by publisher for camera-ready submission;
+%% use 'none' for review submission.
+\setcopyright{none}
+%\setcopyright{acmcopyright}
+%\setcopyright{acmlicensed}
+%\setcopyright{rightsretained}
+%\copyrightyear{2018}           %% If different from \acmYear
+
+% ---------------------------------------------------------
+
+% Use the natbib citations commands, starred version (all authors):
+% - \citet*{...} to cite a reference as a word of the sentence
+% - \citep*{...} to cite a reference as a parenthetical remark
+\usepackage{natbib}
+
+% Loading 'url' here ensures that URLs are broken into several lines in the bibliography (see natbib documentation).
+\usepackage{url}
+
+\bibliographystyle{ACM-Reference-Format}
+\citestyle{acmauthoryear}
+
+% ---------------------------------------------------------
+
+\usepackage[capitalize,noabbrev,nameinlink]{cleveref}
+
+% ---------------------------------------------------------
+
+\usepackage{minted}
+
+\DeclareUnicodeCharacter{3B9}{$\iota$}
+\DeclareUnicodeCharacter{2200}{$\forall$}
+\DeclareUnicodeCharacter{2203}{$\exists$}
+\DeclareUnicodeCharacter{2260}{$\neq$}
+\DeclareUnicodeCharacter{3A3}{$\Sigma$}
+\DeclareUnicodeCharacter{2217}{$\ast$}
+\DeclareUnicodeCharacter{231C}{$\ulcorner$}
+\DeclareUnicodeCharacter{231D}{$\urcorner$}
+
+%------------------------------------------------------------
+
+\usepackage{mathtools}
+
+% ---------------------------------------------------------
+
+\usepackage{macros}
+
+% ---------------------------------------------------------
+% ---------------------------------------------------------
+
+\begin{document}
+
+% ---------------------------------------------------------
+
+\title{
+  \Zoo: A framework for the verification of concurrent \OCaml~5 programs using separation logic
+}
+
+\author{Clément Allain}
+\affiliation{
+  \institution{INRIA}
+  \city{Paris}
+  \country{France}
+}
+\email{clement.allain@inria.fr}
+
+\author{Gabriel Scherer}
+\affiliation{
+  \institution{INRIA}
+  \city{Paris}
+  \country{France}
+}
+\email{gabriel.scherer@inria.fr}
+
+\begin{abstract}
+  \input{abstract}
+\end{abstract}
+
+\maketitle
+
+% ---------------------------------------------------------
+
+\input{introduction}
+
+\input{related}
+
+\input{zoo}
+
+\input{features}
+
+\input{conclusion}
+
+% ---------------------------------------------------------
+
+\hbadness=10000
+\bibliography{main}
+
+\end{document}
