@@ -1,48 +1,8 @@
-\documentclass[acmsmall,screen,review,anonymous,nonacm]{acmart}
-
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
+\documentclass[a4paper,anonymous,cleveref]{lipics-v2021}
 
 % ---------------------------------------------------------
 
-%% Journal information
-%% Supplied to authors by publisher for camera-ready submission;
-%% use defaults for review submission.
-\acmJournal{PACMPL}
-\acmVolume{1}
-\acmNumber{OOPSLA}
-\acmArticle{1}
-\acmYear{2025}
-\acmMonth{10}
-\acmDOI{} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
-\startPage{1}
-
-%% Copyright information
-%% Supplied to authors (based on authors' rights management selection;
-%% see authors.acm.org) by publisher for camera-ready submission;
-%% use 'none' for review submission.
-\setcopyright{none}
-%\setcopyright{acmcopyright}
-%\setcopyright{acmlicensed}
-%\setcopyright{rightsretained}
-%\copyrightyear{2018}           %% If different from \acmYear
-
-% ---------------------------------------------------------
-
-% Use the natbib citations commands, starred version (all authors):
-% - \citet*{...} to cite a reference as a word of the sentence
-% - \citep*{...} to cite a reference as a parenthetical remark
-\usepackage{natbib}
-
-% Loading 'url' here ensures that URLs are broken into several lines in the bibliography (see natbib documentation).
-\usepackage{url}
-
-\bibliographystyle{ACM-Reference-Format}
-\citestyle{acmauthoryear}
-
-% ---------------------------------------------------------
-
-\usepackage[capitalize,noabbrev,nameinlink]{cleveref}
+\bibliographystyle{plainurl}
 
 % ---------------------------------------------------------
 
@@ -57,7 +17,7 @@
 \DeclareUnicodeCharacter{231C}{$\ulcorner$}
 \DeclareUnicodeCharacter{231D}{$\urcorner$}
 
-%------------------------------------------------------------
+%----------------------------------------------------------
 
 \usepackage{mathtools}
 
@@ -66,39 +26,50 @@
 \usepackage{macros}
 
 % ---------------------------------------------------------
+
+\title{
+  \Zoo: A framework for the verification of concurrent \OCaml~5 programs using separation logic
+}
+
+\author{Clément Allain}{INRIA Paris, France}{clement.allain@inria.fr}{https://orcid.org/0009-0005-2972-5181}{}
+
+\author{Gabriel Scherer}{INRIA Paris, France}{gabriel.scherer@inria.fr}{https://orcid.org/0000-0003-1758-3938}{}
+
+\authorrunning{C. Allain and G. Scherer}
+
+\Copyright{Clément Allain and Gabriel Scherer}
+
+\ccsdesc[100]{\textcolor{red}{Replace ccsdesc macro with valid one}} %TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
+
+\keywords{Dummy keyword} %TODO mandatory; please add comma-separated list of keywords
+
+% ---------------------------------------------------------
+
+%Editor-only macros:: begin (do not touch as author)
+\EventEditors{John Q. Open and Joan R. Access}
+\EventNoEds{2}
+\EventLongTitle{16th International Conference on Interactive Theorem Proving (ITP 2025)}
+\EventShortTitle{ITP 2025}
+\EventAcronym{ITP}
+\EventYear{2025}
+\EventDate{September 27 -- October 03, 2025}
+\EventLocation{Reykjavik, Iceland}
+\EventLogo{}
+\SeriesVolume{42}
+\ArticleNo{23}
+
+% ---------------------------------------------------------
 % ---------------------------------------------------------
 
 \begin{document}
 
 % ---------------------------------------------------------
 
-\title{
-  \Zoo: A framework for the verification of concurrent \OCaml~5 programs using separation logic
-}
-
-\author{Clément Allain}
-\affiliation{
-  \institution{INRIA}
-  \city{Paris}
-  \country{France}
-}
-\email{clement.allain@inria.fr}
-
-\author{Gabriel Scherer}
-\affiliation{
-  \institution{INRIA}
-  \city{Paris}
-  \country{France}
-}
-\email{gabriel.scherer@inria.fr}
+\maketitle
 
 \begin{abstract}
   \input{abstract}
 \end{abstract}
-
-\maketitle
-
-% ---------------------------------------------------------
 
 \input{introduction}
 
