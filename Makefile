@@ -1,7 +1,17 @@
-.PHONY : all
-all :
-	@ latexmk -pdf -interaction=nonstopmode main.tex
+LATEXMK=latexmk \
+  -interaction=nonstopmode \
+  -pdf -pdflatex="pdflatex --shell-escape %O %S" \
+  -bibtex
+
+.PHONY : all watch
+all:
+	$(LATEXMK) main.tex
+
+watch:
+	$(LATEXMK) -pvc main.tex
+
+
 
 .PHONY : clean
 clean :
-	@ git clean -fX
+	git clean -fX
