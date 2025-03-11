@@ -1,4 +1,4 @@
-\begin{figure}[tp]
+\begin{figure}[htb]
 \begin{minted}{ocaml}
 type state = Open of Unix.file_descr | Closing of (unit -> unit)
 type t = { mutable ops: int [@atomic]; mutable state: state [@atomic]; }
