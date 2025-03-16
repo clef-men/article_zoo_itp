@@ -3,14 +3,13 @@ LATEXMK=latexmk \
   -pdf -pdflatex="pdflatex --shell-escape %O %S" \
   -bibtex
 
-.PHONY : all watch
-all:
+.PHONY : all
+all :
 	$(LATEXMK) main.tex
 
-watch:
+.PHONY : watch
+watch :
 	$(LATEXMK) -pvc main.tex
-
-
 
 .PHONY : clean
 clean :
