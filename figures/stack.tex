@@ -10,7 +10,8 @@ let rec push t v =
   let old = Atomic.get t in
   let new_ = v :: old in
   if not @@ Atomic.compare_and_set t old new_ then (
-    Domain.cpu_relax () ; push t v
+    Domain.cpu_relax () ;
+    push t v
   )
 
 let rec pop t =
