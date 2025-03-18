@@ -8,13 +8,14 @@ It typically involves finding and reasoning about non-trivial linearization poin
 In recent years, concurrent separation logic~\cite{DBLP:journals/siglog/BrookesO16} has enabled significant progress in this area.
 In particular, the development of \Iris~\cite{DBLP:journals/jfp/JungKJBBD18}, a state-of-the-art mechanized \emph{higher-order} concurrent separation logic with \emph{user-defined ghost state}, has nourished a rich and successful line of works~\cite{DBLP:journals/pacmpl/JungLPRTDJ20,DBLP:conf/cpp/VindumB21,DBLP:conf/cpp/VindumFB22,DBLP:conf/osdi/Chang0STKZ23,DBLP:conf/cpp/CarbonneauxZKON22,DBLP:journals/pacmpl/JungLCKPK23,DBLP:journals/pacmpl/SomersK24,DBLP:journals/pacmpl/MevelJP20,DBLP:journals/pacmpl/MevelJ21,DBLP:conf/pldi/DangJCNMKD22,DBLP:journals/pacmpl/ParkKMJLKK24,DBLP:conf/pldi/MulderKG22,DBLP:journals/pacmpl/MulderK23}, dealing with external~\cite{DBLP:conf/cpp/VindumFB22} and future-dependent~\cite{DBLP:journals/pacmpl/JungLPRTDJ20,DBLP:conf/cpp/VindumB21,DBLP:conf/osdi/Chang0STKZ23} linearization points, relaxed memory~\cite{DBLP:journals/pacmpl/MevelJP20,DBLP:journals/pacmpl/MevelJ21,DBLP:conf/pldi/DangJCNMKD22,DBLP:journals/pacmpl/ParkKMJLKK24} and automation~\cite{DBLP:conf/pldi/MulderKG22,DBLP:journals/pacmpl/MulderK23}.
 
-Most of these works~\cite{DBLP:journals/pacmpl/JungLPRTDJ20,DBLP:conf/cpp/VindumB21,DBLP:conf/cpp/VindumFB22,DBLP:conf/cpp/CarbonneauxZKON22,DBLP:journals/pacmpl/JungLCKPK23,DBLP:journals/pacmpl/SomersK24,DBLP:conf/pldi/MulderKG22,DBLP:journals/pacmpl/MulderK23} and many others~\cite{DBLP:journals/pacmpl/VilhenaPJ20,DBLP:journals/pacmpl/PottierGJM24,DBLP:journals/pacmpl/TimanyGB24,DBLP:journals/pacmpl/LorenzenLSL24} rely on \HeapLang~\cite{heaplang}, the canonical \Iris language.
+Most of these works~\cite{DBLP:journals/pacmpl/JungLPRTDJ20,DBLP:conf/cpp/VindumB21,DBLP:conf/cpp/VindumFB22,DBLP:conf/cpp/CarbonneauxZKON22,DBLP:journals/pacmpl/JungLCKPK23,DBLP:journals/pacmpl/SomersK24,DBLP:conf/pldi/MulderKG22,DBLP:journals/pacmpl/MulderK23} and many others~\cite{DBLP:journals/pacmpl/VilhenaPJ20,DBLP:journals/pacmpl/PottierGJM24,DBLP:journals/pacmpl/TimanyGB24,DBLP:journals/pacmpl/LorenzenLSL24} rely on \HeapLang~\cite{heaplang}, the exemplar \Iris language.
 \HeapLang is a concurrent, imperative, untyped, call-by-value functional language.
 To the best of our knowledge, it is currently the closest language to \OCaml~5 in the \Iris ecosystem---we review the existing frameworks in \cref{sec:related}.
 It has been extended to handle weak memory~\cite{DBLP:journals/pacmpl/MevelJP20} and algebraic effects~\cite{DBLP:journals/pacmpl/VilhenaP21}.
 
-Although \HeapLang is theoretically expressive enough to represent \OCaml programs, our experience showed that it is fairly impractical when it comes to verifying large \OCaml libraries.
+Although \HeapLang is theoretically expressive enough to represent \OCaml programs, our experiments showed that it is fairly impractical when it comes to verifying large \OCaml libraries.
 Indeed, it lacks basic abstractions such as algebraic data types (tuples, mutable and immutable records, variants) and mutually recursive functions.
+Verifying \OCaml programs in \HeapLang requires difficult translation choices and introduces various encodings, to the point that the relation between the source and verified programs can become difficult to maintain and reason about.
 It also has very few standard data structures that can be directly reused.
 This view, we believe, is shared by many people in the \Iris community.
 Our first motivation in this work is therefore to fill this gap by providing a more practical \OCaml-like verification language: \ZooLang.
@@ -29,13 +30,14 @@ In \cref{sec:physical_equality}, we show that (1) \HeapLang's semantics for phys
 To remedy this, we propose a new formal semantics for physical equality and structural equality.
 We hope this work will influence the way these notions are specified in \OCaml.
 
-In summary, we make the following contributions:
+In summary, we claim the following contributions:
 \begin{enumerate}
   \item
     We present \ZooLang, a convenient subset of \OCaml~5 formalized in \Rocq (\cref{sec:zoo,sec:features}).
     \ZooLang comes with a program logic based on \Iris and supports proof automation through \Diaframe~\cite{DBLP:conf/pldi/MulderKG22,DBLP:journals/pacmpl/MulderK23}.
   \item
-    We provide a translator from \OCaml to \ZooLang: \texttt{ocaml2zoo} (\cref{sec:zoo}).
+    We provide a translator from \OCaml to \ZooLang: \texttt{ocaml2zoo} (\cref{sec:zoo}), built for practical
+    applications -- it supports full projects using the \texttt{dune} build system.
   \item
     We formalize physical equality (\cref{sec:physical_equality}) and structural equality (\cref{sec:structural_equality}) in a faithful way.
     The careful analysis of these notions suggests a new \OCaml feature: \emph{generative constructors}.
