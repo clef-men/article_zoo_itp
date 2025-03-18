@@ -15,7 +15,7 @@ Its semantics has been designed to match \OCaml's.
 In addition, it supports \Diaframe~\cite{DBLP:conf/pldi/MulderKG22,DBLP:journals/pacmpl/MulderK23}, enabling proof automation.
 
 The \ZooLang syntax is given in \cref{fig:zoo}\footnote{More precisely, it is the syntax of the surface language, including \Rocq notations.}, omitting mutually recursive toplevel functions that are treated specifically.
-Expressions include standard constructs like booleans, integers, anonymous functions (that may be recursive), \mintinline{ocaml}{let} bindings, sequence, unary and binary operators, conditionals, \mintinline{ocaml}{for} loops, tuples.
+Expressions include standard constructs like booleans, integers, anonymous functions (that may be recursive), applications, \mintinline{ocaml}{let} bindings, sequence, unary and binary operators, conditionals, \mintinline{ocaml}{for} loops, tuples.
 In any expression, one can refer to a \Rocq term representing a \ZooLang value (of type \mintinline{coq}{val}) using its \Rocq identifier.
 \ZooLang is deeply embedded: variables (bound by functions and \mintinline{ocaml}{let}) are quoted, represented as strings.
 
