@@ -78,6 +78,3 @@ Definition rcfd_make : val :=
 Given this semantics and having revealed the \mintinline{ocaml}{Open} block, we can verify the \mintinline{ocaml}{close} function.
 Indeed, if the first \mintinline{ocaml}{Atomic.compare_and_set} fails, we now know that the identifiers of the two blocks, if any, are distinct.
 As there is only one \mintinline{ocaml}{Open} block whose identifier does not change, it cannot be the case that the current state is \mintinline{ocaml}{Open}, hence it is \mintinline{ocaml}{Closing} and we can conclude.
-
-Structural equality is also supported.
-Due to space limitations, we do not describe it here but interested readers may refer to the \Rocq \href{https://github.com/clef-men/zoo/blob/main/theories/zoo/program_logic/structeq.v}{mechanization}\footnote{\url{https://github.com/clef-men/zoo/blob/main/theories/zoo/program\_logic/structeq.v}}.
