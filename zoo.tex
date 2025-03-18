@@ -2,7 +2,6 @@
 \label{sec:zoo}
 
 \input{figures/zoo}
-\input{figures/stack}
 
 In this section, we give an overview of our framework.
 We also provide a minimal example\footnote{\urlAnonymous{https://github.com/clef-men/zoo-demo}} demonstrating its use.
@@ -18,10 +17,10 @@ In addition, it supports \Diaframe~\cite{DBLP:conf/pldi/MulderKG22,DBLP:journals
 The \ZooLang syntax is given in \cref{fig:zoo}\footnote{More precisely, it is the syntax of the surface language, including \Rocq notations.}, omitting mutually recursive toplevel functions that are treated specifically.
 Expressions include standard constructs like booleans, integers, anonymous functions (that may be recursive), \mintinline{ocaml}{let} bindings, sequence, unary and binary operators, conditionals, \mintinline{ocaml}{for} loops, tuples.
 In any expression, one can refer to a \Rocq term representing a \ZooLang value (of type \mintinline{coq}{val}) using its \Rocq identifier.
-\ZooLang is a deeply embedded language: variables (bound by functions and \mintinline{ocaml}{let}) are quoted, represented as strings.
+\ZooLang is deeply embedded: variables (bound by functions and \mintinline{ocaml}{let}) are quoted, represented as strings.
 
 Data constructors (immutable memory blocks) are supported through two constructs : $\texttt{§}C$ represents a constant constructor (\eg $\texttt{§}\texttt{None}$), $\texttt{‘} C\ \texttt{(} e_1 \texttt{,} \dots \texttt{,} e_n \texttt{)}$ represents a non-constant constructor (\eg $\texttt{‘} \texttt{Some( } e \texttt{ )}$).
-Unlike \OCaml, \ZooLang has projections of the form $e \texttt{.<} \mathit{proj} \texttt{>}$ (\eg $\texttt{(} e_1 \texttt{,} e_2 \texttt{).<1>}$), that can be used to obtain a specific component of a tuple or data constructor.
+Unlike \OCaml, \ZooLang has projections of the form $e \texttt{.<} \mathit{proj} \texttt{>}$ (\eg $\texttt{(} x, y \texttt{).<1>}$), that can be used to obtain a specific component of a tuple or data constructor.
 \ZooLang supports shallow pattern matching (patterns cannot be nested) on data constructors with an optional fallback case.
 
 Mutable memory blocks are constructed using either the untagged record syntax $\texttt{\{} e_1 \texttt{,} \dots \texttt{,} e_n \texttt{\}}$ or the tagged record syntax $\texttt{‘} C\ \texttt{\{} e_1 \texttt{,} \dots \texttt{,} e_n \texttt{\}}$.
@@ -30,16 +29,20 @@ Pattern matching can also be used on mutable tagged blocks provided that cases d
 References are also supported through the usual constructs : $\texttt{ref}\ e$ creates a reference, $\texttt{!} e$ reads a reference and $e_1\ \texttt{<-}\ e_2$ writes into a reference.
 The syntax seemingly does not include constructs for arrays but they are supported through the \mintinline{ocaml}{Array} standard module (\eg \texttt{array\_make}).
 
-Parallelism is mainly supported through the \mintinline{ocaml}{Domain} standard module (\eg \texttt{domain\_spawn}).
-Special constructs (\texttt{Xchg}, \texttt{CAS}, \texttt{FAA}), described in \cref{sec:atomic}, are used to model atomic references.
+Note that \ZooLang follows \OCaml in sometimes eschewing orthogonality to provide more compact memory representations: constructors are $n$-ary instead of taking a tuple as parameter, and the tagged record syntax is distinct from a constructor taking a mutable record as parameter. In each case the simplifying encoding would introduce an extra indirection in memory, which is absent from the \ZooLang semantics. Performance-conscious experts care about these representation choices, and we care about faithfully modeling their programs.
 
-The \texttt{Proph} and \texttt{Resolve} constructs are used to model \emph{prophecy variables}~\cite{DBLP:journals/pacmpl/JungLPRTDJ20}, as described in \cref{sec:prophecy}.
+Parallelism is mainly supported through the \mintinline{ocaml}{Domain} standard module (\eg \texttt{domain\_spawn}).
+Special constructs (\texttt{Xchg}, \texttt{CAS}, \texttt{FAA}; see \cref{sec:atomic}) are used to model atomic references.
+
+The \texttt{Proph} and \texttt{Resolve} constructs model \emph{prophecy variables}~\cite{DBLP:journals/pacmpl/JungLPRTDJ20}, see \cref{sec:prophecy}.
 
 \subsection{Translation from \OCaml to \ZooLang}
 
+\input{figures/stack}
+
 While \ZooLang lives in \Rocq, we want to verify \OCaml programs.
-To connect them, we provide a tool to automatically translate \OCaml source files\footnote{Actually, \texttt{ocaml2zoo} processes binary annotation files (\texttt{.cmt} files).} into \Rocq files containing \ZooLang code: \texttt{ocaml2zoo}.
-This tool can process entire \texttt{dune} projects, including many libraries.
+To connect them we provide the tool \texttt{ocaml2zoo} to translate \OCaml source files\footnote{Actually, \texttt{ocaml2zoo} processes binary annotation files (\texttt{.cmt} files).} into \Rocq files containing \ZooLang code.
+This tool can process entire \texttt{dune} projects, and support several libraries provided together or as dependencies of the project.
 
 The supported \OCaml fragment includes: tuples, variants, records (including inline records), shallow \mintinline{ocaml}{match}, atomic record fields, unboxed types, toplevel mutually recursive functions.
 
@@ -57,6 +60,9 @@ Definition stack_push : val :=
     ).
 \end{minted}
 
+\Xgabriel{If we need more space we can move this code to \cref{fig:stack},
+  as a second column on the right.}
+
 \subsection{Specifications and proofs}
 
 Once the translation to \ZooLang is done, the user can write specifications and prove them in \Iris.
@@ -64,23 +70,24 @@ For instance, the specification of the \mintinline{ocaml}{stack_push} function c
 
 \begin{minted}{coq}
 Lemma stack_push_spec t ι v :
-  <<<
-    stack_inv t ι | ∀∀ vs, stack_model t vs
-  >>>
+  <<< stack_inv t ι
+    | ∀∀ vs, stack_model t vs >>>
     stack_push t v @ ↑ι
-  <<<
-    stack_model t (v :: vs) | RET (); True
-  >>>.
+  <<< stack_model t (v :: vs)
+    | RET (); True >>>.
 Proof. ... Qed.
 \end{minted}
 
 Here, we use a \emph{logically atomic specification}~\cite{DBLP:conf/ecoop/PintoDG14}, which has been proven~\cite{DBLP:journals/pacmpl/BirkedalDGJST21} to be equivalent to \emph{linearizability}~\cite{DBLP:journals/toplas/HerlihyW90} in sequentially consistent memory models.
 
-Similarly to \href{https://en.wikipedia.org/wiki/Hoare_logic}{Hoare triples}, the two assertions inside curly brackets represent the precondition and postcondition for the caller.
-For this particular operation, the postcondition is trivial.
-The $\mathrm{stack \mathhyphen inv}\ t$ precondition is the stack invariant.
+Similarly to \href{https://en.wikipedia.org/wiki/Hoare_logic}{Hoare triples},
+the specification is formed of a precondition and a postcondition, represented in angular brackets.
+But each is split in two parts, a \emph{public} or \emph{atomic} condition, and a \emph{private} condition.
+Following standard \Iris notations, the private conditions are on the outside (first line of the precondition, last line of the postcondition) and the atomic conditions are inside.
+
+For this particular operation, the private postcondition is trivial.
+The private condition $\mathtt{stack\_inv}\ t$ is the stack invariant.
 Intuitively, it asserts that $t$ is a valid concurrent stack.
 More precisely, it enforces a set of logical constraints---a concurrent protocol---that $t$ must respect at all times.
 
-The other two assertions inside angle brackets represent the \emph{atomic precondition} and \emph{atomic postcondition}.
-They specify the linearization point of the operation: during the execution of \texttt{stack\_push}, the abstract state of the stack held by $\mathrm{stack \mathhyphen model}$ is atomically updated from $\mathit{vs}$ to $v :: \mathit{vs}$; in other words, $v$ is atomically pushed at the top of the stack.
+The atomic pre- and post-conditions specify the linearization point of the operation: during the execution of \texttt{stack\_push}, the abstract state of the stack held by $\mathtt{stack\_model}$ is atomically updated from $\mathit{vs}$ to $v :: \mathit{vs}$; in other words, $v$ is atomically pushed at the top of the stack.

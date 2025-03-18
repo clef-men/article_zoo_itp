@@ -28,7 +28,7 @@ Essentially, the conclusion we can draw is that the semantics of physical equali
 
 Consider another example given in \cref{fig:rcfd}: the \mintinline{ocaml}{Rcfd.close}\footnote{\url{https://github.com/ocaml-multicore/eio/blob/main/lib_eio/unix/rcfd.ml}} function from the \Eio~\cite{eio} library.
 Essentially, it consists in protecting a file descriptor using reference counting.
-Similarly, it relies on atomically updating the \mintinline{ocaml}{state} field using \mintinline{ocaml}{Atomic.Loc.compare_and_set}\footnote{Here, we make use of atomic record fields that were \href{https://github.com/ocaml/ocaml/pull/13404}{recently introduced} in \OCaml.}.
+Similarly, it relies on atomically updating the \mintinline{ocaml}{state} field using \mintinline{ocaml}{Atomic.Loc.compare_and_set}\footnote{Here, we make use of atomic record fields as we propose them for \OCaml, see Section~\ref{sec:atomic-record-fields}.}.
 However, there is a complication.
 Indeed, we claim that the correctness of \mintinline{ocaml}{close} derives from the fact that the \mintinline{ocaml}{Open} state does not change throughout the lifetime of the data structure; it can be replaced by a \mintinline{ocaml}{Closing} state but never by another \mintinline{ocaml}{Open}.
 In other words, we want to say that 1) this \mintinline{ocaml}{Open} is \emph{physically unique} and 2) \mintinline{ocaml}{Atomic.Loc.compare_and_set} therefore detects whether the data structure has flipped into the \mintinline{ocaml}{Closing} state.
