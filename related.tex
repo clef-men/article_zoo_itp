@@ -4,7 +4,7 @@
 The idea of applying formal methods to verify \OCaml programs is not new.
 Generally speaking, there are mainly two ways:
 
-\paragraph{Semi-automated verification.}
+\subsection{Semi-automated verification}
 
 The verified program is annotated by the user to guide the verification tool: preconditions, postconditions, invariants, \etc.
 Given this input, the tool generates proof obligations that are mostly automatically discharged.
@@ -16,7 +16,7 @@ It is the most common approach and has been widely applied in the literature~\ci
 In \emph{foundational} automated verification, the proofs are checked by a proof assistant like \Rocq, meaning the automation does not have to be trusted.
 To our knowledge, it has been applied to \C~\cite{DBLP:conf/pldi/SammlerLKMD021} and \Rust~\cite{DBLP:journals/pacmpl/GaherSJKD24}.
 
-\paragraph{Non-automated verification.}
+\subsection{Non-automated verification}
 
 The verified program is translated, manually or in an automated way, into a representation living inside a proof assistant.
 The user has to write specifications and prove them.
@@ -27,13 +27,7 @@ For imperative programs, this is more challenging.
 One solution is to use a monad, \eg in \texttt{coq-of-ocaml}~\cite{coq-of-ocaml}, but it does not support concurrency.
 
 The representation may be embedded, meaning the semantics of the language is formalized in the proof assistant.
-This is the path taken by some recent works~\cite{DBLP:books/hal/Chargueraud23, DBLP:journals/pacmpl/GondelmanHPTB23, DBLP:conf/sosp/ChajedTKZ19} harnessing the power of separation logic, in particular the \Iris~\cite{DBLP:journals/jfp/JungKJBBD18} concurrent separation logic.
-\Iris is a very important work for the verification of concurrent algorithms.
-It allows for a rich, customizable ghost state that makes it possible to design complex \emph{concurrent protocols}.
-In our experience, for the lock-free algorithms we considered, there is simply no alternative.
-
-The tool closest to our needs so far is \CFML~\cite{DBLP:books/hal/Chargueraud23}, which targets \OCaml.
+This is the path taken by some recent works~\cite{DBLP:books/hal/Chargueraud23, DBLP:journals/pacmpl/GondelmanHPTB23, DBLP:conf/sosp/ChajedTKZ19,osiris} harnessing the power of separation logic.
+In particular, \CFML~\cite{DBLP:books/hal/Chargueraud23} and \Osiris~\cite{osiris} target \OCaml.
 However, \CFML does not support concurrency and is not based on \Iris.
-The \Osiris~\cite{osiris} framework, still under development, also targets \OCaml and is based on \Iris.
-However, it does not support concurrency and it is arguably non-trivial to introduce it since the semantics uses interaction trees~\cite{DBLP:journals/pacmpl/XiaZHHMPZ20}---the question of how to handle concurrency in this context is a research subject.
-Furthermore, \Osiris is not usable yet; its ambition to support a large fragment of \OCaml makes it a challenge.
+\Osiris, still under development, is based on \Iris but does not support concurrency.
