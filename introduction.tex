@@ -1,53 +1,46 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Designing concurrent algorithms, in particular \href{https://en.wikipedia.org/wiki/Non-blocking_algorithm#Lock-freedom}{\emph{lock-free}} algorithms, is a notoriously difficult task.
-In this paper, we are concerned with proving the correctness of these algorithms.
+Designing concurrent algorithms, in particular fine-grained concurrent algorithms, is a notoriously difficult task.
+Similarly, the formal verification of such algorithms is also difficult.
+It typically involves finding and reasoning about non-trivial linearization points~\cite{DBLP:journals/csur/DongolD15,DBLP:journals/pacmpl/JungLPRTDJ20,DBLP:conf/cpp/VindumB21,DBLP:conf/cpp/VindumFB22,DBLP:conf/osdi/Chang0STKZ23}.
 
-\input{figures/stack}
+In recent years, concurrent separation logic~\cite{DBLP:journals/siglog/BrookesO16} has enabled significant progress in this area.
+In particular, the development of \Iris~\cite{DBLP:journals/jfp/JungKJBBD18}, a state-of-the-art mechanized \emph{higher-order} concurrent separation logic with \emph{user-defined ghost state}, has nourished a rich and successful line of works~\cite{DBLP:journals/pacmpl/JungLPRTDJ20,DBLP:conf/cpp/VindumB21,DBLP:conf/cpp/VindumFB22,DBLP:conf/osdi/Chang0STKZ23,DBLP:conf/cpp/CarbonneauxZKON22,DBLP:journals/pacmpl/JungLCKPK23,DBLP:journals/pacmpl/SomersK24,DBLP:journals/pacmpl/MevelJP20,DBLP:journals/pacmpl/MevelJ21,DBLP:conf/pldi/DangJCNMKD22,DBLP:journals/pacmpl/ParkKMJLKK24,DBLP:conf/pldi/MulderKG22,DBLP:journals/pacmpl/MulderK23}, dealing with external~\cite{DBLP:conf/cpp/VindumFB22} and future-dependent~\cite{DBLP:journals/pacmpl/JungLPRTDJ20,DBLP:conf/cpp/VindumB21,DBLP:conf/osdi/Chang0STKZ23} linearization points, relaxed memory~\cite{DBLP:journals/pacmpl/MevelJP20,DBLP:journals/pacmpl/MevelJ21,DBLP:conf/pldi/DangJCNMKD22,DBLP:journals/pacmpl/ParkKMJLKK24} and automation~\cite{DBLP:conf/pldi/MulderKG22,DBLP:journals/pacmpl/MulderK23}.
 
-\paragraph{Example 1: physical equality.}
+Most of these works~\cite{DBLP:journals/pacmpl/JungLPRTDJ20,DBLP:conf/cpp/VindumB21,DBLP:conf/cpp/VindumFB22,DBLP:conf/cpp/CarbonneauxZKON22,DBLP:journals/pacmpl/JungLCKPK23,DBLP:journals/pacmpl/SomersK24,DBLP:conf/pldi/MulderKG22,DBLP:journals/pacmpl/MulderK23} and many others~\cite{DBLP:journals/pacmpl/VilhenaPJ20,DBLP:journals/pacmpl/PottierGJM24,DBLP:journals/pacmpl/TimanyGB24,DBLP:journals/pacmpl/LorenzenLSL24} rely on \HeapLang~\cite{heaplang}, the canonical \Iris language.
+\HeapLang is a concurrent, imperative, untyped, call-by-value functional language.
+To the best of our knowledge, it is currently the closest language to \OCaml~5 in the \Iris ecosystem---we review the existing frameworks in \cref{sec:related}.
+It has been extended to handle weak memory~\cite{DBLP:journals/pacmpl/MevelJP20} and algebraic effects~\cite{DBLP:journals/pacmpl/VilhenaP21}.
 
-Consider, for example, the \OCaml implementation of a concurrent stack~\cite{thomas1986systems} in \cref{fig:stack}.
-Essentially, it consists of an atomic reference to a list that is updated atomically using the \mintinline{ocaml}{Atomic.compare_and_set} primitive.
-While this simple implementation---it is indeed one of the simplest lockfree algorithms---may seem easy to verify, it is actually more subtle than it looks.
+Although \HeapLang is theoretically expressive enough to represent \OCaml programs, our experience showed that it is fairly impractical when it comes to verifying large \OCaml libraries.
+Indeed, it lacks basic abstractions such as algebraic data types (tuples, mutable and immutable records, variants) and mutually recursive functions.
+It also has very few standard data structures that can be directly reused.
+This view, we believe, is shared by many people in the \Iris community.
+Our first motivation in this work is therefore to fill this gap by providing a more practical \OCaml-like verification language: \ZooLang.
+This language consists in a subset of \OCaml~5 extended with atomic record fields and equipped with a formal semantics and a program logic based on \Iris.
+We were influenced by the \Perennial~\cite{DBLP:conf/sosp/ChajedTKZ19,DBLP:conf/osdi/ChajedTT0KZ21,DBLP:conf/osdi/ChajedTTKZ22,DBLP:conf/osdi/Chang0STKZ23} framework, which achieved similar goals for the \Go language with a focus on crash-safety.
+As in \Perennial, we also provide a translator from \OCaml to \ZooLang: \texttt{ocaml2zoo}.
+We call the resulting framework \Zoo.
 
-Indeed, the semantics of \mintinline{ocaml}{Atomic.compare_and_set} involves \emph{physical equality}: if the content of the atomic reference is physically equal to the expected value, it is atomically updated to the new value.
-Comparing physical equality is tricky and can be dangerous---this is why \emph{structural equality} is often preferred---because the programmer has few guarantees about the \emph{physical identity} of a value.
-In particular, the physical identity of a list, or more generally of an inhabitant of an algebraic data type, is not really specified.
-The only guarantee is: if two values are physically equal, they are also structurally equal.
-Apparently, we don't learn anything interesting when two values are physically distinct.
-Going back to our example, this is fortunately not an issue, since we always retry the operation when \mintinline{ocaml}{Atomic.compare_and_set} returns \mintinline{ocaml}{false}.
+Another, maybe less obvious, shortcoming of \HeapLang is the soundness of its semantics with respect to \OCaml, in other words how faithful it is to the original language.
+One ubiquitous---particularly in lock-free algorithms relying on low-level atomic primitives---and subtle point is \emph{physical equality}.
+In \cref{sec:physical_equality}, we show that (1) \HeapLang's semantics for physical equality is not compatible with \OCaml and (2) \OCaml's informal semantics is actually too imprecise to verify basic concurrent algorithms.
+To remedy this, we propose a new formal semantics for physical equality and structural equality.
+We hope this work will influence the way these notions are specified in \OCaml.
 
-Looking at the standard runtime representation of \OCaml values, this makes sense.
-The empty list is represented by a constant while a non-empty list is represented by pointer to a tagged memory block.
-Physical equality for non-empty lists is just pointer comparison.
-It is clear that two pointers being distinct does not imply the pointed memory blocks are.
-
-From the viewpoint of formal verification, this means we have to carefully design the semantics of the language to be able to reason about physical equality and other subtleties of concurrent programs.
-Essentially, the conclusion we can draw is that the semantics of physical equality and therefore \mintinline{ocaml}{Atomic.compare_and_set} is non-deterministic: we cannot determine the result of physical comparison just by looking at the abstract values.
-
-\paragraph{Example 2: when physical identity matters.}
-
-Consider another example given in \cref{fig:rcfd}: the \mintinline{ocaml}{Rcfd.close}\footnote{\url{https://github.com/ocaml-multicore/eio/blob/main/lib_eio/unix/rcfd.ml}} function from the \Eio~\cite{eio} library.
-Essentially, it consists in protecting a file descriptor using reference counting.
-Similarly, it relies on atomically updating the \mintinline{ocaml}{state} field using \mintinline{ocaml}{Atomic.Loc.compare_and_set}\footnote{Here, we make use of atomic record fields that were \href{https://github.com/ocaml/ocaml/pull/13404}{recently introduced} in \OCaml.}.
-However, there is a complication.
-Indeed, we claim that the correctness of \mintinline{ocaml}{close} derives from the fact that the \mintinline{ocaml}{Open} state does not change throughout the lifetime of the data structure; it can be replaced by a \mintinline{ocaml}{Closing} state but never by another \mintinline{ocaml}{Open}.
-In other words, we want to say that 1) this \mintinline{ocaml}{Open} is \emph{physically unique} and 2) \mintinline{ocaml}{Atomic.Loc.compare_and_set} therefore detects whether the data structure has flipped into the \mintinline{ocaml}{Closing} state.
-In fact, this kind of property appears frequently in lockfree algorithms; it also occurs in the \Kcas~\cite{kcas} library\footnote{\url{https://github.com/ocaml-multicore/kcas/blob/main/doc/gkmz-with-read-only-cmp-ops.md}}.
-
-Once again, this argument requires special care in the semantics of physical equality.
-In short, we have to reveal something about the physical identity of some abstract values.
-Yet, we cannot reveal too much---in particular, we cannot simply convert an abstract value to a concrete one (a memory location)---, since the \OCaml compiler performs optimizations like sharing of immutable constants, and the semantics should remain compatible with adding other optimizations later on, such as forms of hash-consing.
-
-\paragraph{A formalized \OCaml fragment for the verification of concurrent algorithms.}
-
-These subtle aspects, illustrated through two realistic examples, justify the need for a faithful formal semantics of a fragment of \OCaml tailored for the verification of concurrent algorithms.
-Ideally, of course, this fragment would include most of the language.
-However, the direct practical aim of this work---the verification of real-life libraries like \Saturn~\cite{saturn}---led us to the following design philosophy: only include what is actually needed to express and reason about concurrent algorithms in a convenient way.
-
-In this paper, we show how we have designed a practical framework, \Zoo\footnote{\url{https://github.com/clef-men/zoo}}, following this guideline.
-We review the works related to the verification of \OCaml programs in \cref{sec:related}. We describe our framework in \cref{sec:zoo}. We detail the important features, including the treatment of physical equality, in \cref{sec:features}. Finally we mention some side-contributions of this work, which are improvements to the \OCaml language and implementation to better support lock-free concurrent programs.
-
-\input{figures/rcfd}
+In summary, we make the following contributions:
+\begin{enumerate}
+  \item
+    We present \ZooLang, a convenient subset of \OCaml~5 formalized in \Rocq (\cref{sec:zoo,sec:features}).
+    \ZooLang comes with a program logic based on \Iris and supports proof automation through \Diaframe~\cite{DBLP:conf/pldi/MulderKG22,DBLP:journals/pacmpl/MulderK23}.
+  \item
+    We provide a translator from \OCaml to \ZooLang: \texttt{ocaml2zoo} (\cref{sec:zoo}).
+  \item
+    We formalize physical equality (\cref{sec:physical_equality}) and structural equality (\cref{sec:structural_equality}) in a faithful way.
+    The careful analysis of these notions suggests a new \OCaml feature: \emph{generative constructors}.
+  \item
+    We extend \OCaml with \emph{atomic record fields} and \emph{atomic arrays} to ease the development of fine-grained concurrent algorithms (\cref{sec:ocaml}).
+  \item
+    We verify realistic use cases (\cref{sec:physical_equality}) involving physical equality: (1) Treiber stack~\cite{thomas1986systems}, (2) a thread-safe wrapper around a file descriptor using reference-counting from the \Eio~\cite{eio} library.
+\end{enumerate}
