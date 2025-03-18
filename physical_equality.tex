@@ -8,7 +8,7 @@
 
 Consider, for example, the \OCaml implementation of a concurrent stack~\cite{thomas1986systems} in \cref{fig:stack}.
 Essentially, it consists of an atomic reference to a list that is updated atomically using the \mintinline{ocaml}{Atomic.compare_and_set} primitive.
-While this simple implementation---it is indeed one of the simplest lockfree algorithms---may seem easy to verify, it is actually more subtle than it looks.
+While this simple implementation---it is indeed one of the simplest lock-free algorithms---may seem easy to verify, it is actually more subtle than it looks.
 
 Indeed, the semantics of \mintinline{ocaml}{Atomic.compare_and_set} involves \emph{physical equality}: if the content of the atomic reference is physically equal to the expected value, it is atomically updated to the new value.
 Comparing physical equality is tricky and can be dangerous---this is why \emph{structural equality} is often preferred---because the programmer has few guarantees about the \emph{physical identity} of a value.
@@ -33,7 +33,7 @@ Similarly, it relies on atomically updating the \mintinline{ocaml}{state} field 
 However, there is a complication.
 Indeed, we claim that the correctness of \mintinline{ocaml}{close} derives from the fact that the \mintinline{ocaml}{Open} state does not change throughout the lifetime of the data structure; it can be replaced by a \mintinline{ocaml}{Closing} state but never by another \mintinline{ocaml}{Open}.
 In other words, we want to say that 1) this \mintinline{ocaml}{Open} is \emph{physically unique} and 2) \mintinline{ocaml}{Atomic.Loc.compare_and_set} therefore detects whether the data structure has flipped into the \mintinline{ocaml}{Closing} state.
-In fact, this kind of property appears frequently in lockfree algorithms; it also occurs in the \Kcas~\cite{kcas} library\footnote{\url{https://github.com/ocaml-multicore/kcas/blob/main/doc/gkmz-with-read-only-cmp-ops.md}}.
+In fact, this kind of property appears frequently in lock-free algorithms; it also occurs in the \Kcas~\cite{kcas} library\footnote{\url{https://github.com/ocaml-multicore/kcas/blob/main/doc/gkmz-with-read-only-cmp-ops.md}}.
 
 Once again, this argument requires special care in the semantics of physical equality.
 In short, we have to reveal something about the physical identity of some abstract values.
