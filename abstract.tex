@@ -1,7 +1,14 @@
 The release of \OCaml~5, which introduced parallelism into the language, drove the need for safe and efficient concurrent data structures.
-New libraries like \Saturn~\cite{saturn} aim at addressing this need.
+New libraries like \Saturn% ~\cite{saturn}
+aim at addressing this need.
 From the perspective of formal verification, this is an opportunity to apply and further state-of-the-art techniques to provide stronger guarantees.
 
 We present a framework for verifying fine-grained concurrent \OCaml~5 algorithms.
-Following a pragmatic approach, we support a limited but sufficient fragment of the language whose semantics has been carefully formalized to faithfully express such algorithms.
-Source programs are translated to a deeply-embedded language living inside \Rocq where they can be specified and verified using the \Iris~\cite{DBLP:journals/jfp/JungKJBBD18} concurrent separation logic.
+We followed a pragmatic approach, studying \OCaml code written by concurrency expert to delimit a limited but sufficient fragment of the language to express those algorithms; the outcome is a dialect of \OCaml that we call \ZooLang.
+We formalized its semantics carefully via a deep embedding in the \Rocq proof assistant.
+We provide a tool to translate source \OCaml programs into \ZooLang syntax inside \Rocq, where they can be specified and verified using the \Iris% ~\cite{DBLP:journals/jfp/JungKJBBD18}
+concurrent separation logic.
+
+We verified fine-grained concurrent algorithms, along with subsets of the \OCaml standard library necessary to express them: the classic Treiber stack, and a use of reference-counting for file descriptors within the \Eio library.
+This formalization work uncovered delicate questions of programming-language semantics, around physical equality for example.
+In the process, we also extended \OCaml to more efficiently express certain concurrent programs.
