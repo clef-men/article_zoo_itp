@@ -2,19 +2,20 @@
 \label{sec:zoo}
 
 \input{figures/zoo}
+\input{figures/stack}
 
-In this section, we give an overview of the framework.
-We also provide a \href{https://github.com/clef-men/zoo-demo}{minimal example}\footnote{\url{https://github.com/clef-men/zoo-demo}} demonstrating its use.
+In this section, we give an overview of our framework.
+We also provide a minimal example\footnote{\urlAnonymous{https://github.com/clef-men/zoo-demo}} demonstrating its use.
 
-\paragraph{Language.}
+\subsection{Language}
 
-The core of \Zoo is \ZooLang: an untyped, ML-like, imperative, concurrent programming language that is fully formalized in \Rocq.
+The core of \Zoo is \ZooLang: a concurrent, imperative, untyped, functional programming language fully formalized in \Rocq.
 Its semantics has been designed to match \OCaml's.
 
-\ZooLang comes with a program logic based on \Iris : reasoning rules expressed in separation logic (including rules for the different constructs of the language) along with \Rocq tactics that integrate into the \Iris proof mode~\cite{DBLP:conf/popl/KrebbersTB17,DBLP:journals/pacmpl/KrebbersJ0TKTCD18}.
-In addition, it supports \Diaframe~\cite{DBLP:conf/pldi/MulderKG22}, enabling proof automation.
+\ZooLang comes with a program logic based on \Iris: reasoning rules expressed in separation logic (including rules for the different constructs of the language) along with \Rocq tactics that integrate into the \Iris proof mode~\cite{DBLP:conf/popl/KrebbersTB17,DBLP:journals/pacmpl/KrebbersJ0TKTCD18}.
+In addition, it supports \Diaframe~\cite{DBLP:conf/pldi/MulderKG22,DBLP:journals/pacmpl/MulderK23}, enabling proof automation.
 
-The \ZooLang syntax is given in \cref{fig:zoo}\footnote{More precisely, it is the syntax of the surface language, including many \Rocq notations.}, omitting mutually recursive toplevel functions that are treated specifically.
+The \ZooLang syntax is given in \cref{fig:zoo}\footnote{More precisely, it is the syntax of the surface language, including \Rocq notations.}, omitting mutually recursive toplevel functions that are treated specifically.
 Expressions include standard constructs like booleans, integers, anonymous functions (that may be recursive), \mintinline{ocaml}{let} bindings, sequence, unary and binary operators, conditionals, \mintinline{ocaml}{for} loops, tuples.
 In any expression, one can refer to a \Rocq term representing a \ZooLang value (of type \mintinline{coq}{val}) using its \Rocq identifier.
 \ZooLang is a deeply embedded language: variables (bound by functions and \mintinline{ocaml}{let}) are quoted, represented as strings.
@@ -34,18 +35,16 @@ Special constructs (\texttt{Xchg}, \texttt{CAS}, \texttt{FAA}), described in \cr
 
 The \texttt{Proph} and \texttt{Resolve} constructs are used to model \emph{prophecy variables}~\cite{DBLP:journals/pacmpl/JungLPRTDJ20}, as described in \cref{sec:prophecy}.
 
-Finally, \texttt{Reveal} is a special source construct that we introduce to handle physical equality.
-We demystify it in \cref{sec:physical_equality}.
-
-\paragraph{Translation from \OCaml to \ZooLang.}
+\subsection{Translation from \OCaml to \ZooLang}
 
 While \ZooLang lives in \Rocq, we want to verify \OCaml programs.
 To connect them, we provide a tool to automatically translate \OCaml source files\footnote{Actually, \texttt{ocaml2zoo} processes binary annotation files (\texttt{.cmt} files).} into \Rocq files containing \ZooLang code: \texttt{ocaml2zoo}.
 This tool can process entire \texttt{dune} projects, including many libraries.
 
-The supported \OCaml fragment includes: shallow \mintinline{ocaml}{match}, ADTs, records, inline records, atomic record fields, unboxed types, toplevel mutually recursive functions.
+The supported \OCaml fragment includes: tuples, variants, records (including inline records), shallow \mintinline{ocaml}{match}, atomic record fields, unboxed types, toplevel mutually recursive functions.
 
-As an example of what \texttt{ocaml2zoo} can generate, the \mintinline{ocaml}{push} function from \cref{sec:introduction} is translated into:
+Consider, for example, the \OCaml implementation of a concurrent stack~\cite{thomas1986systems} in \cref{fig:stack}.
+The \mintinline{ocaml}{push} function is translated into:
 
 \begin{minted}{coq}
 Definition stack_push : val :=
@@ -58,7 +57,7 @@ Definition stack_push : val :=
     ).
 \end{minted}
 
-\paragraph{Specifications and proofs.}
+\subsection{Specifications and proofs}
 
 Once the translation to \ZooLang is done, the user can write specifications and prove them in \Iris.
 For instance, the specification of the \mintinline{ocaml}{stack_push} function could be:
@@ -66,13 +65,11 @@ For instance, the specification of the \mintinline{ocaml}{stack_push} function c
 \begin{minted}{coq}
 Lemma stack_push_spec t ι v :
   <<<
-    stack_inv t ι
-  | ∀∀ vs, stack_model t vs
+    stack_inv t ι | ∀∀ vs, stack_model t vs
   >>>
     stack_push t v @ ↑ι
   <<<
-    stack_model t (v :: vs)
-  | RET (); True
+    stack_model t (v :: vs) | RET (); True
   >>>.
 Proof. ... Qed.
 \end{minted}
