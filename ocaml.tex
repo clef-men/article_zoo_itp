@@ -53,17 +53,12 @@ Declaring a record field atomic simply requires an \mintinline{ocaml}{[@atomic]}
 
 \begin{minted}{ocaml}
 (* re-implementation of atomic references *)
-type 'a atomic_ref = {
-  mutable contents : 'a [@atomic];
-}
+type 'a atomic_ref = { mutable contents : 'a [@atomic]; }
 
 (* concurrent linked list *)
 type 'a node =
 | Nil
-| Cons of {
-    value: 'a
-    mutable next : 'a node [@atomic];
-  }
+| Cons of { value: 'a; mutable next : 'a node [@atomic]; }
 
 (* bounded SPSC circular buffer *)
 type 'a bag = {
