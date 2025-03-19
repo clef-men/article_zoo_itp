@@ -200,3 +200,5 @@ This shows that even on immediate values, specifying physical equality as equali
   For example, if \mintinline{ocaml}{x} is defined as the integer \mintinline{ocaml}{42}, then \mintinline{ocaml}{(x :: []) == (42 :: [])} may or may not  hold, depending on the OCaml implementation being used.
   But one can prove that both arguments are definitionally equal in Rocq, so physical equality cannot be modeled by a Rocq function of type \mintinline{coq}{val -> val -> bool}.
 \end{enumerate}
+
+\Xgabriel{TODO: specifying this carefully gives a predicate on high-level values that is non-deterministic.}
