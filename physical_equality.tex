@@ -82,25 +82,37 @@ let test2 = [0;1]  == [0;1]  (* true *)
 
 On its own, sharing is not a problem.
 However, coupled with representation conflicts, it can be surprising.
-For example, the following tests may return \mintinline{ocaml}{true}:
-
-\begin{minted}{ocaml}
-let test1 = Obj.repr false == Obj.repr 0 (* true *)
-let test2 = Obj.repr None  == Obj.repr 0 (* true *)
-let test3 = Obj.repr []    == Obj.repr 0 (* true *)
-\end{minted}
-
-This observation has important implications.
 Indeed, consider the \mintinline{ocaml}{any} type defined as:
 
 \begin{minted}{ocaml}
 type any = Any : 'a -> any
 \end{minted}
 
+The following tests may return \mintinline{ocaml}{true}:
+
+\begin{minted}{ocaml}
+let test1 = Any false == Any 0 (* true *)
+let test2 = Any None  == Any 0 (* true *)
+let test3 = Any []    == Any 0 (* true *)
+\end{minted}
+
 Now, going back to the \texttt{push} function of \cref{fig:stack}, we have a problem.
 Given a stack of \mintinline{ocaml}{any}, it is possible for the \mintinline{ocaml}{Atomic.compare_and_set} to observe a current list (\eg, \mintinline{ocaml}{[Any 0]}) physically equal to the expected list (\eg, \mintinline{ocaml}{[Any false]}) while these are actually distinct in \Rocq.
 In short, the expected specification of \cref{sec:zoo} is incorrect.
 To fix it, we would need to reason \emph{modulo physically equality}, which is non-standard and quite burdensome.
+
+We believe this really is a shortcoming, at least from the verification perspective.
+Therefore, we propose to extend \OCaml with \emph{generative immutable blocks}\footnote{\urlAnonymous{https://github.com/clef-men/ocaml/tree/generative_constructors}}.
+These generative blocks are just like regular immutable blocks, except they cannot be shared.
+Hence, if physical equality on two generative blocks returns \mintinline{ocaml}{true}, these blocks are necessarily equal in \Rocq.
+At user level, this notion is materialized by \emph{generative constructors}.
+For instance, to verify the expected \texttt{push} specification, we can use a generative version of lists:
+
+\begin{minted}{ocaml}
+type 'a list =
+  | Nil
+  | Cons of 'a * 'a list [@generative]
+\end{minted}
 
 \subsection{When physical equality returns \mintinline{ocaml}{false}}
 
