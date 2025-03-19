@@ -9,7 +9,7 @@ This primitive is commonly used to try committing an atomic operation in a retry
 
 In \HeapLang, this primitive is provided but restricted.
 Indeed, its semantics is only defined if either the expected or the desired value fits in a single memory word in the \HeapLang value representation: literals (booleans, integers and pointers\footnote{\HeapLang allows arbitrary pointer arithmetic and therefore inner pointers. This is forbidden in both \OCaml and \ZooLang, as any reachable value has to be compatible with the garbage collector.}) and literal injections\footnote{\HeapLang has no primitive notion of constructor, only pairs and injections (left and right).}; otherwise, the program is stuck.
-In practice, this restriction forces the programmer to introduce an indirection~\cite{iris/examples,DBLP:conf/cpp/VindumB21} to physically compare complex values, \eg lists.
+\Xgabriel[In practice, this restriction forces the programmer to introduce an indirection~\cite{iris/examples,DBLP:conf/cpp/VindumB21} to physically compare complex values, \eg lists.]{I don't understand this well: in OCaml as well, cons-cells are represented by ``an indirection'' (a pointer to a block with the head and tail), what is the difference here? I think that you are making a subtle distinction because you think of the ``value'' of mutable blocks as their pointer (as in OCaml), but the ``value'' of immutable as something else (whereas OCaml programmers would typically think of the pointer as well). This should be explained, otherwise what you say here is fairly confusing.}
 Furthermore, when the semantics is defined, values are compared using their \Rocq representations; physical equality boils down to \Rocq equality.
 
 In \OCaml, physical equality is more tricky and often considered dangerous.
@@ -18,6 +18,7 @@ However, structural equality is typically much slower than physical equality, as
 Also, the \mintinline{ocaml}{Atomic.compare_and_set} requires the comparison to be atomic, which is the case for physical equality but not structural equality.
 
 In particular, the semantics of physical equality is \emph{non-deterministic}.
+\Xgabriel{Non-deterministic on high-level values, not on low-level values. Again, omitting this distinction here makes the story hard to understand and potentially confusing.}
 To see why, consider the case of \emph{immutable blocks} representing constructors and immutable records (as opposed to \emph{mutable blocks} representing mutable records), \eg \mintinline{ocaml}{Some 0}.
 The physical comparison of two seemingly identical immutable blocks, according to the \Rocq representation (essentially a tag and a list of fields), may return \mintinline{ocaml}{false}.
 Indeed, at runtime, a non-empty immutable block is represented by a pointer to a tagged memory block.
@@ -26,10 +27,11 @@ It is clear that two pointers being distinct does not imply the pointed memory b
 In other words, we cannot determine the result of physical comparison just by looking at the abstract values.
 
 The question is then: what guarantees do we get when physical equality returns \mintinline{ocaml}{true} and when it returns \mintinline{ocaml}{false}?
-Unfortunately, the only guarantee \OCaml provides is: if two values are physically equal, they are also structurally equal.
+Unfortunately, the only guarantee that \OCaml \Xgabriel[provides]{\emph{documents}} is: if two values are physically equal, they are also structurally equal.
 This means we don't learn anything when two values are physically distinct.
+\Xgabriel{We provide more guarantees on mutable values. You are implicitly talking about immutable constructors here.}
 
-In the following, we will explore both cases, looking at the optimizations both the compiler and the runtime system may perform.
+In the following, we will explore both cases, looking at the optimizations that the compiler or the runtime system may perform.
 We will show that the aforementioned guarantee is arguably not sufficient to verify interesting concurrent programs and attempt to establish stronger guarantees.
 
 \subsection{When physical equality returns \mintinline{ocaml}{true}}
@@ -38,8 +40,8 @@ Let us go back to the concurrent stack of \cref{fig:stack} and more specifically
 To prove the atomic specification given in \cref{sec:zoo}, we rely on the fact that, if \mintinline{ocaml}{Atomic.compare_and_set} returns \mintinline{ocaml}{true}, we actually observe the same list of values in the sense of \Rocq equality.
 However, assuming only structural equality as per \OCaml's specification of physical equality, this is not true.
 To see why, consider, \eg, a stack of references (\mintinline{ocaml}{'a ref}).
-As structural equality is indeed \emph{structural}, it traverses the references, giving no information whatsoever about their \emph{physical identity}.
-Hence, we cannot prove the specification.
+\Xgabriel[As structural equality is indeed \emph{structural}, it traverses the references, giving no information whatsoever about their \emph{physical identity}.
+Hence, we cannot prove the specification.]{I don't understand these two sentences.}
 
 This conclusion might seem surprising and counterintuitive.
 Indeed, we know that physical equality essentially boils down to a comparison instruction, so we should be able to say more.
@@ -55,6 +57,7 @@ Booleans, integers and empty immutable blocks are represented by immediate integ
 This encoding induces conflicts: two seemingly distinct values in \Rocq may have the same encoding.
 For example, the following tests all return \mintinline{ocaml}{true} (\mintinline{ocaml}{Obj.repr} is an unsafe primitive revealing the memory representation of a value):
 
+\Xgabriel{I would rather show the tests with the existential GADT, which do not require the Obj module and are more arguably ``valid OCaml''.}
 \begin{minted}{ocaml}
 let test1 = Obj.repr false == Obj.repr 0 (* true *)
 let test2 = Obj.repr None  == Obj.repr 0 (* true *)
