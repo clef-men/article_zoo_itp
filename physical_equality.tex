@@ -185,20 +185,18 @@ Inductive val :=
 For example, the value $'\texttt{Cons} (42, \texttt{§}\texttt{Nil})$ is represented in Rocq as \mintinline{coq}{Block 1 [Lit (Int 42), Block 0 []]}. Notice that immutable blocks are represented in Rocq using the \mintinline{coq}{Block} constructor directly, and \emph{not} as a location (\mintinline{coq}{Loc}) allocated on the heap. We use locations only for \emph{mutable} records. We would say that our representation of \ZooLang values is \emph{high-level}, as close to the surface syntax as reasonably possible. This distinction is important to make verification pleasant in practice, by reducing the number of locations and heap indirections that the programmer needs to work with during verification. A \ZooLang tuple is directly a tuple, etc., and this design decision of using high-level values is important to the verification experience.
 \Xclement{Not only that, but assuming full ownership of arguments of immutable blocks would be incorrect.}
 
-It is tempting to specify, as \HeapLang does, that physical equality decides equality between high-level values. This specification makes sense for immediate values (integers, booleans), and for mutable records which are compared by location. But it is incorrect on immutable blocks, and \HeapLang essentially does not specify its behavior on those values. But programmers use physical equality on immutable blocks in practice, as in our example of a Treiber stack of \cref{fig:stack}.
+It is tempting to specify, as \HeapLang does, that physical equality decides equality between high-level values. This specification makes sense for immediate values (integers, booleans), and for mutable records which are compared by location. But it is incorrect on immutable blocks, and \HeapLang essentially does not specify its behavior on those values. Yet programmers use physical equality on immutable blocks in practice, as in our example of a Treiber stack of \cref{fig:stack}.
 
 Defining physical equality as equality of high-level values is problematic in two opposite ways:
 \begin{enumerate}
 \item Some distinct high-level values are physically equal in OCaml, for example \mintinline{ocaml}{0} and \mintinline{ocaml}{false}. Their type differ, but it possible to store them in an existential type where they can be compared for physical equality:
-
 \begin{minted}{ocaml}
 type any = Any : 'a -> any
 let test1 = Any false == Any 0 (* true *)
 \end{minted}
-
 This shows that even on immediate values, specifying physical equality as equality of high-level values is convenient but incorrect in practice.
 
 \item A deeper problem is that some \emph{definitionally equal} high-level values may be physically distinct.
-  For example, if $x$ is defined as the integer \mintinline{ocaml}{42}, then \mintinline{ocaml}{(x :: []) == (42 :: [])} may or may not   hold, depending on the OCaml implementation being used.
+  For example, if \mintinline{ocaml}{x} is defined as the integer \mintinline{ocaml}{42}, then \mintinline{ocaml}{(x :: []) == (42 :: [])} may or may not  hold, depending on the OCaml implementation being used.
   But one can prove that both arguments are definitionally equal in Rocq, so physical equality cannot be modeled by a Rocq function of type \mintinline{coq}{val -> val -> bool}.
 \end{enumerate}
