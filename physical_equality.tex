@@ -167,22 +167,23 @@ This primitive is commonly used to try committing an atomic operation in a retry
 
 At the same time this notion is difficult to specify correctly, and this can result in dangerous gaps between the programming language used to write code and the semantics used for its verification.
 
-\ZooLang has a grammar of values, and most operations are specified by defining how they compute with \ZooLang values. Its definition may look as follows in Rocq:
+\ZooLang has a grammar of values, and most operations are specified by defining how they compute with \ZooLang values. Its definition may look as follows in Rocq (simplified slightly):
 \begin{minted}{coq}
 Inductive literal :=
-  | LitBool (b : bool)
-  | LitInt (n : nat)
-  | LitLoc (l : location)
-  | LitProph (pid : prophet_id)
-  | LitPoison.
+  | Bool (b : bool)
+  | Int (n : nat)
+  | Loc (l : location)
+  | Proph (pid : prophet_id)
+  | Poison.
 
 Inductive val :=
-  | ValLit (lit : literal)
-  | ValRecs (i : nat) (recs : list (binder * binder * expr))
-  | ValBlock (tag : nat) (vs : list val).
+  | Lit (lit : literal)
+  | Recs (i : nat) (recs : list (binder * binder * expr))
+  | Block (tag : nat) (vs : list val).
 \end{minted}
 
-For example, the value $'\texttt{Cons} (42, \texttt{§}\texttt{Nil})$ is represented in Rocq as \mintinline{coq}{ValBlock 1 [LitInt 42, ValBlock 0 []]}. Notice that immutable blocks are represented in Rocq using the \mintinline{coq}{ValBlock} constructor directly, and \emph{not} as a location (\mintinline{coq}{LitLoc}) allocated on the heap. We use locations only for \emph{mutable} records. We would say that our representation of \ZooLang values is \emph{high-level}, as close to the surface syntax as reasonably possible. This distinction is important to make verification pleasant in practice, by reducing the number of locations and heap indirections that the programmer needs to work with during verification. A \ZooLang tuple is directly a tuple, etc., and this design decision of using high-level values is important to the verification experience in practice.
+For example, the value $'\texttt{Cons} (42, \texttt{§}\texttt{Nil})$ is represented in Rocq as \mintinline{coq}{Block 1 [Lit (Int 42), Block 0 []]}. Notice that immutable blocks are represented in Rocq using the \mintinline{coq}{Block} constructor directly, and \emph{not} as a location (\mintinline{coq}{Loc}) allocated on the heap. We use locations only for \emph{mutable} records. We would say that our representation of \ZooLang values is \emph{high-level}, as close to the surface syntax as reasonably possible. This distinction is important to make verification pleasant in practice, by reducing the number of locations and heap indirections that the programmer needs to work with during verification. A \ZooLang tuple is directly a tuple, etc., and this design decision of using high-level values is important to the verification experience.
+\Xclement{Not only that, but assuming full ownership of arguments of immutable blocks would be incorrect.}
 
 It is tempting to specify, as \HeapLang does, that physical equality decides equality between high-level values. This specification makes sense for immediate values (integers, booleans), and for mutable records which are compared by location. But it is incorrect on immutable blocks, and \HeapLang essentially does not specify its behavior on those values. But programmers use physical equality on immutable blocks in practice, as in our example of a Treiber stack of \cref{fig:stack}.
 
