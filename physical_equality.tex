@@ -38,10 +38,7 @@ We will show that the aforementioned guarantee is arguably not sufficient to ver
 
 Let us go back to the concurrent stack of \cref{fig:stack} and more specifically the \mintinline{ocaml}{push} function.
 To prove the atomic specification given in \cref{sec:zoo}, we rely on the fact that, if \mintinline{ocaml}{Atomic.compare_and_set} returns \mintinline{ocaml}{true}, we actually observe the same list of values in the sense of \Rocq equality.
-However, assuming only structural equality as per \OCaml's specification of physical equality, this is not true.
-To see why, consider, \eg, a stack of references (\mintinline{ocaml}{'a ref}).
-\Xgabriel[As structural equality is indeed \emph{structural}, it traverses the references, giving no information whatsoever about their \emph{physical identity}.
-Hence, we cannot prove the specification.]{I don't understand these two sentences.}
+But this specification cannot be proven if we only assume, on immutable blocks such as lists, that physical equality implies structural equality: given two lists of references, if we learn that they are (structurally) equal, we cannot conclude that their references are the same.
 
 This conclusion might seem surprising and counterintuitive.
 Indeed, we know that physical equality essentially boils down to a comparison instruction, so we should be able to say more.
