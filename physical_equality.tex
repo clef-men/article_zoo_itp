@@ -116,6 +116,26 @@ type 'a list =
 
 \subsection{When physical equality returns \mintinline{ocaml}{false}}
 
+The informal \OCaml specification does not give any guarantee when physical equality returns \mintinline{ocaml}{false}.
+In most cases, including try loops, this is fine.
+However, in some specific cases, more information is needed.
+
+Consider the \mintinline{ocaml}{Rcfd} module from the \Eio~\cite{eio} library, an excerpt of which is given in \cref{fig:rcfd}.
+Thomas Leonard, its author, suggested that we verify this real-life example because of its intricate logical state.
+However, we found out that it is also relevant regarding the semantics of physical equality.
+Essentially, it consists in wrapping a file descriptor in a thread-safe way using reference-counting.
+
+%Essentially, it consists in protecting a file descriptor using reference counting.
+%Similarly, it relies on atomically updating the \mintinline{ocaml}{state} field using \mintinline{ocaml}{Atomic.Loc.compare_and_set}\footnote{Here, we make use of atomic record fields as we propose them for \OCaml, see Section~\ref{sec:atomic-record-fields}.}.
+%However, there is a complication.
+%Indeed, we claim that the correctness of \mintinline{ocaml}{close} derives from the fact that the \mintinline{ocaml}{Open} state does not change throughout the lifetime of the data structure; it can be replaced by a \mintinline{ocaml}{Closing} state but never by another \mintinline{ocaml}{Open}.
+%In other words, we want to say that 1) this \mintinline{ocaml}{Open} is \emph{physically unique} and 2) \mintinline{ocaml}{Atomic.Loc.compare_and_set} therefore detects whether the data structure has flipped into the \mintinline{ocaml}{Closing} state.
+%In fact, this kind of property appears frequently in lock-free algorithms; it also occurs in the \Kcas~\cite{kcas} library\footnote{\url{https://github.com/ocaml-multicore/kcas/blob/main/doc/gkmz-with-read-only-cmp-ops.md}}.
+%
+%Once again, this argument requires special care in the semantics of physical equality.
+%In short, we have to reveal something about the physical identity of some abstract values.
+%Yet, we cannot reveal too much---in particular, we cannot simply convert an abstract value to a concrete one (a memory location)---, since the \OCaml compiler performs optimizations like sharing of immutable constants, and the semantics should remain compatible with adding other optimizations later on, such as forms of hash-consing.
+
 
 %If physical comparison returns \mintinline{ocaml}{false}, the semantics of \OCaml tells us essentially nothing: two immutable blocks may have distinct identities but same content.
 %However, given this semantics, we cannot verify the \mintinline{ocaml}{Rcfd} example of \cref{sec:introduction}.
@@ -138,18 +158,3 @@ type 'a list =
 %Given this semantics and having revealed the \mintinline{ocaml}{Open} block, we can verify the \mintinline{ocaml}{close} function.
 %Indeed, if the first \mintinline{ocaml}{Atomic.compare_and_set} fails, we now know that the identifiers of the two blocks, if any, are distinct.
 %As there is only one \mintinline{ocaml}{Open} block whose identifier does not change, it cannot be the case that the current state is \mintinline{ocaml}{Open}, hence it is \mintinline{ocaml}{Closing} and we can conclude.
-
-
-%\paragraph{Example 2: when physical identity matters.}
-%
-%Consider another example given in \cref{fig:rcfd}: the \mintinline{ocaml}{Rcfd.close}\footnote{\url{https://github.com/ocaml-multicore/eio/blob/main/lib_eio/unix/rcfd.ml}} function from the \Eio~\cite{eio} library.
-%Essentially, it consists in protecting a file descriptor using reference counting.
-%Similarly, it relies on atomically updating the \mintinline{ocaml}{state} field using \mintinline{ocaml}{Atomic.Loc.compare_and_set}\footnote{Here, we make use of atomic record fields as we propose them for \OCaml, see Section~\ref{sec:atomic-record-fields}.}.
-%However, there is a complication.
-%Indeed, we claim that the correctness of \mintinline{ocaml}{close} derives from the fact that the \mintinline{ocaml}{Open} state does not change throughout the lifetime of the data structure; it can be replaced by a \mintinline{ocaml}{Closing} state but never by another \mintinline{ocaml}{Open}.
-%In other words, we want to say that 1) this \mintinline{ocaml}{Open} is \emph{physically unique} and 2) \mintinline{ocaml}{Atomic.Loc.compare_and_set} therefore detects whether the data structure has flipped into the \mintinline{ocaml}{Closing} state.
-%In fact, this kind of property appears frequently in lock-free algorithms; it also occurs in the \Kcas~\cite{kcas} library\footnote{\url{https://github.com/ocaml-multicore/kcas/blob/main/doc/gkmz-with-read-only-cmp-ops.md}}.
-%
-%Once again, this argument requires special care in the semantics of physical equality.
-%In short, we have to reveal something about the physical identity of some abstract values.
-%Yet, we cannot reveal too much---in particular, we cannot simply convert an abstract value to a concrete one (a memory location)---, since the \OCaml compiler performs optimizations like sharing of immutable constants, and the semantics should remain compatible with adding other optimizations later on, such as forms of hash-consing.
