@@ -28,6 +28,16 @@ It is clear that two pointers being distinct does not imply the pointed memory b
 In other words, we cannot determine the result of physical comparison just by looking at the abstract values.
 
 The question is then: what guarantees do we get when physical equality returns \mintinline{ocaml}{true} and when it returns \mintinline{ocaml}{false}?
+Given such guarantees, denoted by \mintinline{coq}{val_physeq} and \mintinline{coq}{val_physneq}, the non-deterministic semantics is reflected in the logic through the following specification:
+
+\begin{minted}{coq}
+Lemma physeq_spec v1 v2 :
+  {{{ True }}}
+    v1 == v2
+  {{{ b, RET #b; ⌜(if b then val_physeq else val_physneq) v1 v2⌝ }}}
+Proof. ... Qed.
+\end{minted}
+
 The \OCaml manual documents a partial specification for physical equality, which is precise for basic types such as references, but does not clearly extend to structured values containing a mix of immutable and mutable constructors.
 The only guarantee that it provides for all values is: if two values are physically equal, they are also structurally equal.
 This means we don't learn anything when two values are physically distinct.
