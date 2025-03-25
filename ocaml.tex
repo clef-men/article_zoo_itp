@@ -15,19 +15,14 @@ Data races on non-atomic mutable locations has a much weaker semantics and is ge
 For example, the Michael-Scott concurrent queue~\cite{DBLP:conf/podc/MichaelS96} relies on a linked list structure that could be defined as follows:
 
 \begin{minted}{ocaml}
-type 'a node =
-| Nil
-| Cons of { value : 'a; next : 'a node Atomic.t }
+type 'a node = Nil | Cons of { value : 'a; next : 'a node Atomic.t }
 \end{minted}
 
 Performance-minded concurrency experts dislike this representation, because \mintinline{ocaml}{'a Atomic.t} introduces an indirection in memory: it is represented as a pointer to a block containing the value of type \mintinline{ocaml}{'a}.
 Instead, they use something like the following:
 
 \begin{minted}{ocaml}
-type 'a node =
-| Nil
-| Cons of { mutable next: 'a node; value: 'a }
-
+type 'a node = Nil | Cons of { mutable next: 'a node; value: 'a }
 let as_atomic : 'a node -> 'a node Atomic.t option = function
   | Nil -> None
   | (Next _) as record -> Some (Obj.magic record : 'a node Atomic.t)
@@ -57,16 +52,13 @@ Declaring a record field atomic simply requires an \mintinline{ocaml}{[@atomic]}
 type 'a atomic_ref = { mutable contents : 'a [@atomic]; }
 
 (* concurrent linked list *)
-type 'a node =
-| Nil
-| Cons of { value: 'a; mutable next : 'a node [@atomic]; }
+type 'a node = Nil | Cons of { value: 'a; mutable next : 'a node [@atomic]; }
 
 (* bounded SPSC circular buffer *)
-type 'a bag = {
-  data : 'a Atomic.t array;
-  mutable front: int [@atomic];
-  mutable back: int [@atomic];
-}
+type 'a bag =
+  { data : 'a Atomic.t array;
+    mutable front: int [@atomic];
+    mutable back: int [@atomic]; }
 \end{minted}
 
 The design difficulty is to express atomic operations on atomic record fields.
