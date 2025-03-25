@@ -80,7 +80,7 @@ As an evidence of this, lists~\citeAnonymous{DBLP:journals/pacmpl/AllainC0S24} a
 \subsection{Concurrent primitives}
 \label{sec:atomic}
 
-\Zoo supports concurrent primitives both on atomic references (from \mintinline{ocaml}{Atomic}) and atomic record fields (from \mintinline{ocaml}{Atomic.Loc}\footnote{The \mintinline{ocaml}{Atomic.Loc} module is part of the \href{https://github.com/ocaml/ocaml/pull/13404}{PR} that implements atomic record fields.}) according to the table below.
+\Zoo supports concurrent primitives both on atomic references (from \mintinline{ocaml}{Atomic}) and atomic record fields (from \mintinline{ocaml}{Atomic.Loc}\footnote{The \mintinline{ocaml}{Atomic.Loc} module is part of the \href{https://github.com/ocaml/ocaml/pull/13404}{PR} that implements atomic record fields (see \cref{sec:ocaml}).}) according to the table below.
 The \OCaml expressions listed in the left-hand column translate into the \Zoo expressions in the right-hand column.
 Notice that an atomic location \mintinline[escapeinside=||]{ocaml}{[%atomic.loc |$e$|.|$f$|]} (of type \mintinline{ocaml}{_ Atomic.Loc.t}) translates directly into $e \texttt{.[} f \texttt{]}$.
 
