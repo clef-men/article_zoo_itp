@@ -28,7 +28,8 @@ It is clear that two pointers being distinct does not imply the pointed memory b
 In other words, we cannot determine the result of physical comparison just by looking at the abstract values.
 
 The question is then: what guarantees do we get when physical equality returns \mintinline{ocaml}{true} and when it returns \mintinline{ocaml}{false}?
-Basically, the only\footnote{Actually, the \OCaml manual mentions a second guarantee for "mutable types". Its informal, if not confusing, formulation makes it hard to interpret. We neglect it here, as it does not interfere with our reasoning.} guarantee that \OCaml documents is: if two values are physically equal, they are also structurally equal.
+The \OCaml manual documents a partial specification for physical equality, which is precise for basic types such as references, but does not clearly extend to structured values containing a mix of immutable and mutable constructors.
+The only guarantee that it provides for all values is: if two values are physically equal, they are also structurally equal.
 This means we don't learn anything when two values are physically distinct.
 
 In the following, we will explore both cases, looking at the optimizations that the compiler or the runtime system may perform.

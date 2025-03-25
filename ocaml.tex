@@ -8,8 +8,6 @@ We worked on improving \OCaml itself to reduce these work-arounds or semantic mi
 \subsection{Atomic record fields}
 \label{sec:atomic-record-fields}
 
-\subsubsection{Before}
-
 \OCaml~5 offers a type \mintinline{ocaml}{'a Atomic.t} of atomic references exposing sequentially-consistent atomic operations.
 Data races on non-atomic mutable locations has a much weaker semantics and is generally considered a programming error.
 For example, the Michael-Scott concurrent queue~\cite{DBLP:conf/podc/MichaelS96} relies on a linked list structure that could be defined as follows:
@@ -42,7 +40,7 @@ It is difficult to write correctly and use, in particular as unsafe casts can so
 
 Note that this unsafe approach only works for the first field of a record, so it is not applicable to records that hold several atomic fields, such as the toplevel record storing atomic \mintinline{ocaml}{front} and \mintinline{ocaml}{back} pointers for the concurrent queue.
 
-\subsubsection{Atomic fields proposal}
+\subsubsection{Our atomic fields proposal}
 
 We proposed a design for atomic record fields as an \OCaml language change proposal: RFC~\#39\footnote{\urlAnonymous{https://github.com/ocaml/RFCs/pull/39}}.
 Declaring a record field atomic simply requires an \mintinline{ocaml}{[@atomic]} attribute---and could eventually become a proper keyword of the language.
