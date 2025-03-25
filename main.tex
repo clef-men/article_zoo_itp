@@ -19,6 +19,15 @@
 \DeclareUnicodeCharacter{2248}{$\approx$}
 \DeclareUnicodeCharacter{2249}{$\not\approx$}
 
+% https://stackoverflow.com/questions/2318598/how-to-reduce-the-separation-from-other-text-using-latex-minted
+% https://tex.stackexchange.com/questions/19359/reduce-space-between-sinput-and-soutput/19423#19423
+\newlength{\fancyvrbtopsep}
+\newlength{\fancyvrbpartopsep}
+\makeatletter
+\FV@AddToHook{\FV@ListParameterHook}{\topsep=\fancyvrbtopsep\partopsep=\fancyvrbpartopsep}
+\makeatother
+\setlength{\fancyvrbtopsep}{0mm}
+
 % ------------------------------------------------
 
 \usepackage{mathtools}
