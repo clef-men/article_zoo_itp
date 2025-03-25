@@ -35,7 +35,7 @@ It is very difficult to be confident about its usage given that it may typically
 In the example above, casting a two-fields record into a one-argument atomic reference may or may not be sound---but it gives measurable performance improvements on concurrent queue benchmarks. (TODO: benchmark to quantify the improvement.)
 
 It is possible to statically forbid passing \mintinline{ocaml}{Nil} to \mintinline{ocaml}{as_atomic} to avoid error handling, by turning \mintinline{ocaml}{'a node} into a GADT indexed over it a type-level representation of its head constructor.
-Examples of this pattern can be found in the \Kcas library by Vesa Karvonen.
+Examples of this pattern can be found in the \Kcas~\cite{kcas} library by Vesa Karvonen.
 It is difficult to write correctly and use, in particular as unsafe casts can sometimes hide type-errors in the intended static discipline.
 
 Note that this unsafe approach only works for the first field of a record, so it is not applicable to records that hold several atomic fields, such as the toplevel record storing atomic \mintinline{ocaml}{front} and \mintinline{ocaml}{back} pointers for the concurrent queue.
