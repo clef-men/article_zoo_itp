@@ -42,7 +42,7 @@ Note that this unsafe approach only works for the first field of a record, so it
 
 \subsubsection{Our atomic fields proposal}
 
-We proposed a design for atomic record fields as an \OCaml language change proposal: RFC~\#39\footnote{\urlAnonymous{https://github.com/ocaml/RFCs/pull/39}}.
+We proposed a design for atomic record fields as an \OCaml language change proposal: RFC~\#39\footnote{\urlDeanonymizing{https://github.com/ocaml/RFCs/pull/39}}.
 Declaring a record field atomic simply requires an \mintinline{ocaml}{[@atomic]} attribute---and could eventually become a proper keyword of the language.
 
 \begin{minted}{ocaml}
@@ -64,7 +64,7 @@ For example, if \mintinline{ocaml}{buf} has type \mintinline{ocaml}{'a bag} abov
 But how would one express exchange, compare-and-set and fetch-and-add?
 We would like to avoid adding a new primitive language construct for each atomic operation.
 
-Our proposed implementation\footnote{\urlAnonymous{https://github.com/ocaml/ocaml/pull/13404}}
+Our proposed implementation\footnote{\urlDeanonymizing{https://github.com/ocaml/ocaml/pull/13404}}
 introduces a built-in type \mintinline{ocaml}{'a Atomic.Loc.t}
 for an atomic location that holds an element of type
 \mintinline{ocaml}{'a}, with a syntax extension

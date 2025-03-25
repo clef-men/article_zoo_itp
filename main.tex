@@ -39,7 +39,10 @@
 \usepackage{mycomments}
 
 \newcommand{\urlAnonymous}[1]{%
-  \href{#1}{Non-anonymous link}%
+  Non-anonymous link: \href{#1}{https://<clickable>}%
+}
+\newcommand{\urlDeanonymizing}[1]{%
+  De-anonymizing link: \url{#1}%
 }
 \newcommand{\citeAnonymous}[1]{%
   [anonymous]%
