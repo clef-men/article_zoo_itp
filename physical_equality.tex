@@ -81,7 +81,7 @@ In summary, when physical equality on immediate values returns \mintinline{ocaml
 
 Finally, let us consider the case of non-empty immutable blocks.
 At runtime, they are represented by pointers to tagged memory blocks.
-At first approximation, it is tempting to say that physically equal immutable blocks really are the same in \Rocq.
+At first approximation, it is tempting to say that physically equal immutable blocks really are definitionally equal in \Rocq.
 Alas, this is not true.
 To explain why, we have to recall that the \OCaml compiler and the runtime system (\eg, through hash-consing) may perform \emph{sharing}: immutable blocks containing physically equal fields may be shared.
 For example, the following tests may return \mintinline{ocaml}{true}:
@@ -115,7 +115,7 @@ To fix it, we would need to reason \emph{modulo physically equality}, which is n
 We believe this really is a shortcoming, at least from the verification perspective.
 Therefore, we propose to extend \OCaml with \emph{generative immutable blocks}\footnote{\urlAnonymous{https://github.com/clef-men/ocaml/tree/generative_constructors}}.
 These generative blocks are just like regular immutable blocks, except they cannot be shared.
-Hence, if physical equality on two generative blocks returns \mintinline{ocaml}{true}, these blocks are necessarily equal in \Rocq.
+Hence, if physical equality on two generative blocks returns \mintinline{ocaml}{true}, these blocks are definitionally equal in \Rocq.
 At user level, this notion is materialized by \emph{generative constructors}.
 For instance, to verify the expected \mintinline{ocaml}{push} specification, we can use a generative version of lists:
 
@@ -129,8 +129,8 @@ type 'a list =
 
 \input{figures/rcfd}
 
-The informal \OCaml specification does not give any guarantee when physical equality returns \mintinline{ocaml}{false}.
-In most cases, including try loops, this is fine.
+Most formalizations of physical equality in the literature do not give any guarantee when physical equality returns \mintinline{ocaml}{false}.
+Many use-cases of physical equality, in particular retry loops, can be verified with only sufficient conditions on \mintinline{ocaml}{true}.
 However, in some specific cases, more information is needed.
 
 Consider the \mintinline{ocaml}{Rcfd} module from the \Eio~\cite{eio} library, an excerpt of which is given in \cref{fig:rcfd}\footnote{We make use of \emph{atomic record fields} as introduced in \cref{sec:atomic-record-fields}.}.
@@ -161,15 +161,16 @@ let test = x == x (* false *)
 \end{minted}
 
 Going back to \mintinline{ocaml}{Rcfd}, we have a problem: in the second branch, the \mintinline{ocaml}{Open} block corresponding to \mintinline{ocaml}{prev} could be unshared, which would make \mintinline{ocaml}{Atomic.Loc.compare_and_set} fail.
-Hence, we cannot prove the expected specification.
+Hence, we cannot prove the expected specification; in fact, the program as it is written has a bug.
 
-To remedy this unfortunate situation, we propose to reuse the notions of generative immutable blocks, that we introduced to prevent sharing, to also forbid unsharing.
-More precisely, each generative block is annotated with a \emph{logical identifier}\footnote{Actually, for practical reasons, we distinguish identified and unidentified generative blocks.} representing its physical identity, much like a pointer for a mutable block.
+To remedy this unfortunate situation, we propose to reuse the notions of generative immutable blocks, that we introduced to prevent sharing, to also forbid unsharing by the \OCaml compiler -- we implemented this in an experiment branch of \OCaml.
+
+In our semantics, each generative block is annotated with a \emph{logical identifier}\footnote{Actually, for practical reasons, we distinguish identified and unidentified generative blocks.} representing its physical identity, much like a pointer for a mutable block.
 If physical equality on two generative blocks returns \mintinline{ocaml}{false}, the two identifiers are necessarily distinct.
 Given this semantics, we can verify the \mintinline{ocaml}{close} function.
 Indeed, if \mintinline{ocaml}{Atomic.Loc.compare_and_set} fails, we now know that the identifiers of the two blocks, if any, are distinct.
-As there is only one \mintinline{ocaml}{Open} block whose identifier does not change, it cannot be the case that the current state is \mintinline{ocaml}{Open}, hence it is \mintinline{ocaml}{Closing} and we can conclude.
-In practice, it suffices to patch the \mintinline{ocaml}{state} type:
+As there is only one \mintinline{ocaml}{Open} block whose identifier does not change, it cannot be the case that the current state is \mintinline{ocaml}{Open}, hence it is \mintinline{ocaml}{Closing}.
+We can verify this function after adding the following annotation:
 
 \begin{minted}{ocaml}
 type state =
