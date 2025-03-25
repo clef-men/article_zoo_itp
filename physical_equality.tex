@@ -68,6 +68,7 @@ As far as we are aware, there is no optimization that could break this.
 Booleans, integers and empty immutable blocks are represented by immediate integers through an encoding.
 This encoding induces conflicts: two seemingly distinct values in \Rocq may have the same encoding.
 For example, the following tests all return \mintinline{ocaml}{true} (\mintinline{ocaml}{Obj.repr} is an unsafe primitive revealing the memory representation of a value):
+
 \begin{minted}{ocaml}
 let test1 = Obj.repr false == Obj.repr 0 (* true *)
 let test2 = Obj.repr None  == Obj.repr 0 (* true *)
@@ -84,6 +85,7 @@ At first approximation, it is tempting to say that physically equal immutable bl
 Alas, this is not true.
 To explain why, we have to recall that the \OCaml compiler and the runtime system (\eg, through hash-consing) may perform \emph{sharing}: immutable blocks containing physically equal fields may be shared.
 For example, the following tests may return \mintinline{ocaml}{true}:
+
 \begin{minted}{ocaml}
 let test1 = Some 0 == Some 0 (* true *)
 let test2 = [0;1]  == [0;1]  (* true *)
@@ -92,11 +94,13 @@ let test2 = [0;1]  == [0;1]  (* true *)
 On its own, sharing is not a problem.
 However, coupled with representation conflicts, it can be surprising.
 Indeed, consider the \mintinline{ocaml}{any} type defined as:
+
 \begin{minted}{ocaml}
 type any = Any : 'a -> any
 \end{minted}
 
 The following tests may return \mintinline{ocaml}{true}:
+
 \begin{minted}{ocaml}
 let test1 = Any false == Any 0 (* true *)
 let test2 = Any None  == Any 0 (* true *)
@@ -114,6 +118,7 @@ These generative blocks are just like regular immutable blocks, except they cann
 Hence, if physical equality on two generative blocks returns \mintinline{ocaml}{true}, these blocks are necessarily equal in \Rocq.
 At user level, this notion is materialized by \emph{generative constructors}.
 For instance, to verify the expected \mintinline{ocaml}{push} specification, we can use a generative version of lists:
+
 \begin{minted}{ocaml}
 type 'a list =
   | Nil
@@ -149,6 +154,7 @@ Unfortunately, it is an immutable block, and immutable blocks are subject to mor
 In fact, something surprising but allowed\footnote{This has been confirmed by \OCaml experts developing the \Flambda backend.} by \OCaml can happen: \emph{unsharing}, the dual of sharing.
 Indeed, any immutable block can be unshared, that is reallocated.
 For example, the following test may theoretically return \mintinline{ocaml}{false}:
+
 \begin{minted}{ocaml}
 let x = Some 0
 let test = x == x (* false *)
@@ -164,6 +170,7 @@ Given this semantics, we can verify the \mintinline{ocaml}{close} function.
 Indeed, if \mintinline{ocaml}{Atomic.Loc.compare_and_set} fails, we now know that the identifiers of the two blocks, if any, are distinct.
 As there is only one \mintinline{ocaml}{Open} block whose identifier does not change, it cannot be the case that the current state is \mintinline{ocaml}{Open}, hence it is \mintinline{ocaml}{Closing} and we can conclude.
 In practice, it suffices to patch the \mintinline{ocaml}{state} type:
+
 \begin{minted}{ocaml}
 type state =
   | Open of Unix.file_descr [@generative]
