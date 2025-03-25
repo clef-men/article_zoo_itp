@@ -11,7 +11,8 @@ type t =
 let make fd = { ops = 0; state = Open fd }
 
 let closed = Closing (fun () -> ())
-let close t = match t.state with
+let close t =
+  match t.state with
   | Closing _ -> false
   | Open fd as prev ->
       let next = Closing (fun () -> Unix.close fd) in

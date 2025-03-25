@@ -18,8 +18,7 @@ Axiom structeq_spec : ∀ v1 v2 footprint,
     v1 = v2
   {{{ b, RET #b;
       structeq_footprint footprint ∗
-      ⌜(if b then val_structeq else val_structneq) footprint v1 v2⌝
-  }}}.
+      ⌜(if b then val_structeq else val_structneq) footprint v1 v2⌝ }}}.
 \end{minted}
 
 Obviously, this general specification is not very convenient to work with.

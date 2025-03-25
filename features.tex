@@ -26,8 +26,7 @@ Given this incantation, one may directly use the tags \texttt{Nil} and \texttt{C
 Definition map : val :=
   rec: "map" "fn" "t" =>
     match: "t" with
-    | Nil =>
-        §Nil
+    | Nil => §Nil
     | Cons "x" "t" =>
         let: "y" := "fn" "x" in
         ‘Cons( "y", "map" "fn" "t" )
@@ -43,8 +42,7 @@ Notation "'f2'" := (in_type "t" 1) (in custom zoo_field).
 Definition swap : val :=
   fun: "t" =>
     let: "f1" := "t".{f1} in
-    "t" <-{f1} "t".{f2} ;;
-    "t" <-{f2} "f1".
+    "t" <-{f1} "t".{f2} ;; "t" <-{f2} "f1".
 \end{minted}
 
 \subsection{Mutually recursive functions}
