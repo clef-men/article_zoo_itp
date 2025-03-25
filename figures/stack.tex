@@ -1,7 +1,6 @@
 \begin{figure}[t!]
 \begin{minted}{ocaml}
 type 'a t = 'a list Atomic.t
-
 let create () = Atomic.make []
 
 let rec push t v =

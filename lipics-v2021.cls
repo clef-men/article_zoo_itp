@@ -358,12 +358,16 @@
   \@starttoc{toc}}
 \setcounter{secnumdepth}{4}
 \renewcommand\section{\@startsection {section}{1}{\z@}%
-                                   {-3.5ex \@plus -1ex \@minus -.2ex}%
-                                   {2.3ex \@plus.2ex}%
+%HACK                                   {-3.5ex \@plus -1ex \@minus -.2ex}%
+%HACK                                   {2.3ex \@plus.2ex}%
+                                     {2em}%
+                                     {0.5em}%
                                    {\sffamily\Large\bfseries\raggedright}}
 \renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
-                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
-                                     {1.5ex \@plus .2ex}%
+%HACK                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+%HACK                                     {1.5ex \@plus .2ex}%
+                                     {1em}%
+                                     {0.5em}%
                                      {\sffamily\Large\bfseries\raggedright}}
 \renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
                                      {-3.25ex\@plus -1ex \@minus -.2ex}%
