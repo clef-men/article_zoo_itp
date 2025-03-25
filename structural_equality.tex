@@ -31,6 +31,6 @@ Lemma structeq_spec_abstract `{zoo_G : !ZooG Σ} v1 v2 :
   val_abstract v2 →
   {{{ True }}}
     v1 = v2
-  {{{ b, RET #b; ⌜(if b then (≈) else (≉)) v1 v2⌝ }}}
+  {{{ b, RET #b; ⌜(if b then val_physeq else val_physneq) v1 v2⌝ }}}
 Proof. ... Qed.
 \end{minted}

@@ -957,7 +957,70 @@
   bibsource    = {dblp computer science bibliography, https://dblp.org}
 }
 
-@software{saturn,
+@phdthesis{DBLP:phd/hal/Jourdan16,
+  author       = {Jacques{-}Henri Jourdan},
+  title        = {Verasco: a Formally Verified {C} Static Analyzer. (Verasco: un analyseur
+                  statique pour {C} formellement v{\'{e}}rifi{\'{e}})},
+  school       = {Paris Diderot University, France},
+  year         = {2016},
+  url          = {https://tel.archives-ouvertes.fr/tel-01327023},
+  timestamp    = {Tue, 21 Jul 2020 00:40:52 +0200},
+  biburl       = {https://dblp.org/rec/phd/hal/Jourdan16.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{DBLP:journals/jar/BraibantJM14,
+  author       = {Thomas Braibant and
+                  Jacques{-}Henri Jourdan and
+                  David Monniaux},
+  title        = {Implementing and Reasoning About Hash-consed Data Structures in Coq},
+  journal      = {J. Autom. Reason.},
+  volume       = {53},
+  number       = {3},
+  pages        = {271--304},
+  year         = {2014},
+  url          = {https://doi.org/10.1007/s10817-014-9306-0},
+  doi          = {10.1007/S10817-014-9306-0},
+  timestamp    = {Sun, 02 Oct 2022 15:40:05 +0200},
+  biburl       = {https://dblp.org/rec/journals/jar/BraibantJM14.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+@phdthesis{boulme:tel-03356701,
+  TITLE = {{Formally Verified Defensive Programming (efficient Coq-verified computations from untrusted ML oracles)}},
+  AUTHOR = {Boulm{\'e}, Sylvain},
+  URL = {https://hal.science/tel-03356701},
+  NOTE = {See also http://www-verimag.imag.fr/~boulme/hdr.html},
+  SCHOOL = {{Universit{\'e} Grenoble-Alpes}},
+  YEAR = {2021},
+  MONTH = Sep,
+  KEYWORDS = {Formal Methods ; SAT-solving ; CompCert verified compiler ; Abstract Interpretation ; M{\'e}thodes formelles},
+  TYPE = {Accreditation to supervise research},
+  PDF = {https://hal.science/tel-03356701v1/file/boulme_hdr.pdf},
+  HAL_ID = {tel-03356701},
+  HAL_VERSION = {v1},
+}
+
+@article{lean-pointer-optimizations,
+author = {Selsam, Daniel and Hudon, Simon and de Moura, Leonardo},
+title = {Sealing pointer-based optimizations behind pure functions},
+year = {2020},
+issue_date = {August 2020},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {4},
+number = {ICFP},
+url = {https://doi.org/10.1145/3408997},
+doi = {10.1145/3408997},
+abstract = {Functional programming languages are particularly well-suited for building automated reasoning systems, since (among other reasons) a logical term is well modeled by an inductive type, traversing a term can be implemented generically as a higher-order combinator, and backtracking search is dramatically simplified by persistent datastructures. However, existing pure functional programming languages all suffer a major limitation in these domains: traversing a term requires time proportional to the tree size of the term as opposed to its graph size. This limitation would be particularly devastating when building automation for interactive theorem provers such as Lean and Coq, for which the exponential blowup of term-tree sizes has proved to be both common and difficult to prevent. All that is needed to recover the optimal scaling is the ability to perform simple operations on the memory addresses of terms, and yet allowing these operations to be used freely would clearly violate the basic premise of referential transparency. We show how to use dependent types to seal the necessary pointer-address manipulations behind pure functional interfaces while requiring only a negligible amount of additional trust. We have implemented our approach for the upcoming version (v4) of Lean, and our approach could be adopted by other languages based on dependent type theory as well.},
+journal = {Proc. ACM Program. Lang.},
+month = aug,
+articleno = {115},
+numpages = {20},
+keywords = {interactive theorem proving, functional programming, Lean}
+}
+
+@misc{saturn,
   title = {Saturn},
   author = {Vesa Karvonen and Carine Morel},
   date = {2024},
