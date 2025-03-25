@@ -178,6 +178,19 @@ type state =
   | Closing of (unit -> unit)
 \end{minted}
 
+\subsection{Summary}
+
+In summary, we give the following specification to physical equality in \ZooLang, which also serves as a precise specification of physical equality of a practical fragment of \OCaml:
+
+\begin{itemize}
+\item On values whose low-level representation is
+  an immediate integer, physical equality is immediate equality.
+\item On values whose low-level representation are
+  mutable blocks at some location, or generative immutable blocks with some identity, physical equality is equality of locations or identities.
+\item On values whose low-level representation are immutable blocks, physical-equality is under-specified, but it implies that the blocks that the same tags and that their arguments are in turn physically equal.
+\item Two values that fall into different categories above are never physically equal.
+\end{itemize}
+
 %\section{Physical equality -- alternative proposal}
 %
 %The notion of \emph{physical equality} is ubiquitous in fine-grained concurrent algorithms.
