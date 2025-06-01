@@ -14,7 +14,7 @@ Its semantics has been designed to match \OCaml's.
 \ZooLang comes with a program logic based on \Iris: reasoning rules expressed in separation logic (including rules for the different constructs of the language) along with \Rocq tactics that integrate into the \Iris proof mode~\cite{DBLP:conf/popl/KrebbersTB17,DBLP:journals/pacmpl/KrebbersJ0TKTCD18}.
 In addition, it supports \Diaframe~\cite{DBLP:conf/pldi/MulderKG22,DBLP:journals/pacmpl/MulderK23}, enabling proof automation.
 
-The \ZooLang syntax is given in \cref{fig:zoo}\footnote{More precisely, it is the syntax of the surface language, including \Rocq notations.}, omitting mutually recursive toplevel functions that are treated specifically.
+The \ZooLang syntax is given in \cref{fig:zoo}\footnote{More precisely, it is the syntax of the surface language, including \Rocq notations.}, omitting mutually recursive toplevel functions that are treated specially.
 Expressions include standard constructs like booleans, integers, anonymous functions (that may be recursive), applications, \mintinline{ocaml}{let} bindings, sequence, unary and binary operators, conditionals, \mintinline{ocaml}{for} loops, tuples.
 In any expression, one can refer to a \Rocq term representing a \ZooLang value (of type \mintinline{coq}{val}) using its \Rocq identifier.
 \ZooLang is deeply embedded: variables (bound by functions and \mintinline{ocaml}{let}) are quoted as strings.
@@ -76,12 +76,12 @@ Proof. ... Qed.
 Here, we use a \emph{logically atomic specification}~\cite{DBLP:conf/ecoop/PintoDG14}, which has been proven~\cite{DBLP:journals/pacmpl/BirkedalDGJST21} to be equivalent to \emph{linearizability}~\cite{DBLP:journals/toplas/HerlihyW90} in sequentially consistent memory models.
 
 Similarly to \href{https://en.wikipedia.org/wiki/Hoare_logic}{Hoare triples},
-the specification is formed of a precondition and a postcondition, represented in angular brackets.
+the specification is formed of a precondition and a postcondition, represented in angle brackets.
 But each is split in two parts, a \emph{public} or \emph{atomic} condition, and a \emph{private} condition.
 Following standard \Iris notations, the private conditions are on the outside (first line of the precondition, last line of the postcondition) and the atomic conditions are inside.
 
 For this particular operation, the private postcondition is trivial.
-The private condition $\mathtt{stack\_inv}\ t$ is the stack invariant.
+The private precondition $\mathtt{stack\_inv}\ t$ is the stack invariant.
 Intuitively, it asserts that $t$ is a valid concurrent stack.
 More precisely, it enforces a set of logical constraints---a concurrent protocol---that $t$ must respect at all times.
 

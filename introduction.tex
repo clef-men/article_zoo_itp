@@ -19,7 +19,7 @@ Verifying \OCaml programs in \HeapLang requires difficult translation choices an
 It also has very few standard data structures that can be directly reused.
 This view, we believe, is shared by many people in the \Iris community.
 Our first motivation in this work is therefore to fill this gap by providing a more practical \OCaml-like verification language: \ZooLang.
-This language consists in a subset of \OCaml~5 extended with atomic record fields and equipped with a formal semantics and a program logic based on \Iris.
+This language consists of a subset of \OCaml~5 extended with atomic record fields and equipped with a formal semantics and a program logic based on \Iris.
 We were influenced by the \Perennial~\cite{DBLP:conf/sosp/ChajedTKZ19,DBLP:conf/osdi/ChajedTT0KZ21,DBLP:conf/osdi/ChajedTTKZ22,DBLP:conf/osdi/Chang0STKZ23} framework, which achieved similar goals for the \Go language with a focus on crash-safety.
 As in \Perennial, we also provide a translator from \OCaml to \ZooLang: \texttt{ocaml2zoo}.
 We call the resulting framework \Zoo.

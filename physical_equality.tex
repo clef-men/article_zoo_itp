@@ -16,7 +16,7 @@ Furthermore, when the semantics is defined, values are compared using their \Roc
 
 In \OCaml, physical equality is more tricky and often considered dangerous.
 \emph{Structural equality}, which we describe in \cref{sec:structural_equality}, should be the preferred way of comparing values.
-However, structural equality is typically much slower than physical equality, as it basically compiles to only one assembly instruction.
+However, physical equality is typically much faster than structural equality, as it basically compiles to only one assembly instruction.
 Also, the \mintinline{ocaml}{Atomic.compare_and_set} requires the comparison to be atomic, which is the case for physical equality but not structural equality.
 
 In particular, the semantics of physical equality is \emph{non-deterministic}.
@@ -110,7 +110,7 @@ let test3 = Any []    == Any 0 (* true *)
 Now, going back to the \mintinline{ocaml}{push} function of \cref{fig:stack}, we have a problem.
 Given a stack of \mintinline{ocaml}{any}, it is possible for the \mintinline{ocaml}{Atomic.compare_and_set} to observe a current list (\eg, \mintinline{ocaml}{[Any 0]}) physically equal to the expected list (\eg, \mintinline{ocaml}{[Any false]}) while these are actually distinct in \Rocq.
 In short, the expected specification of \cref{sec:zoo} is incorrect.
-To fix it, we would need to reason \emph{modulo physically equality}, which is non-standard and quite burdensome.
+To fix it, we would need to reason \emph{modulo physical equality}, which is non-standard and quite burdensome.
 
 We believe this really is a shortcoming, at least from the verification perspective.
 Therefore, we propose to extend \OCaml with \emph{generative immutable blocks}\footnote{\urlAnonymous{https://github.com/clef-men/ocaml/tree/generative_constructors}}.
@@ -187,7 +187,7 @@ In summary, we give the following specification to physical equality in \ZooLang
   an immediate integer, physical equality is immediate equality.
 \item On values whose low-level representation are
   mutable blocks at some location, or generative immutable blocks with some identity, physical equality is equality of locations or identities.
-\item On values whose low-level representation are immutable blocks, physical-equality is under-specified, but it implies that the blocks that the same tags and that their arguments are in turn physically equal.
+\item On values whose low-level representation are immutable blocks, physical-equality is under-specified, but it implies that the blocks have the same tags and their arguments are in turn physically equal.
 \item Two values that fall into different categories above are never physically equal.
 \end{itemize}
 

@@ -23,7 +23,7 @@ Instead, they use something like the following:
 type 'a node = Nil | Cons of { mutable next: 'a node; value: 'a }
 let as_atomic : 'a node -> 'a node Atomic.t option = function
   | Nil -> None
-  | (Next _) as record -> Some (Obj.magic record : 'a node Atomic.t)
+  | (Cons _) as record -> Some (Obj.magic record : 'a node Atomic.t)
 \end{minted}
 
 Notice that the \mintinline{ocaml}{next} field of the \mintinline{ocaml}{Cons} constructor has been moved first in the type declaration.
@@ -34,7 +34,7 @@ The code uses \mintinline{ocaml}{Obj.magic} to unsafely cast this value to an at
 It is very difficult to be confident about its usage given that it may typically violate assumptions made by the \OCaml compiler and optimizer.
 In the example above, casting a two-fields record into a one-argument atomic reference may or may not be sound---but it gives measurable performance improvements on concurrent queue benchmarks.
 
-It is possible to statically forbid passing \mintinline{ocaml}{Nil} to \mintinline{ocaml}{as_atomic} to avoid error handling, by turning \mintinline{ocaml}{'a node} into a GADT indexed over it a type-level representation of its head constructor.
+It is possible to statically forbid passing \mintinline{ocaml}{Nil} to \mintinline{ocaml}{as_atomic} to avoid error handling, by turning \mintinline{ocaml}{'a node} into a GADT indexed over a type-level representation of its head constructor.
 Examples of this pattern can be found in the \Kcas~\cite{kcas} library by Vesa Karvonen.
 It is difficult to write correctly and use, in particular as unsafe casts can sometimes hide type-errors in the intended static discipline.
 
