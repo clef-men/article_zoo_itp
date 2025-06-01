@@ -32,7 +32,7 @@ The code uses \mintinline{ocaml}{Obj.magic} to unsafely cast this value to an at
 
 \mintinline{ocaml}{Obj.magic} is a shunned unsafe cast (the \OCaml equivalent of \mintinline{ocaml}{unsafe} or \mintinline{ocaml}{unsafePerformIO}).
 It is very difficult to be confident about its usage given that it may typically violate assumptions made by the \OCaml compiler and optimizer.
-In the example above, casting a two-fields record into a one-argument atomic reference may or may not be sound---but it gives measurable performance improvements on concurrent queue benchmarks. (TODO: benchmark to quantify the improvement.)
+In the example above, casting a two-fields record into a one-argument atomic reference may or may not be sound---but it gives measurable performance improvements on concurrent queue benchmarks.
 
 It is possible to statically forbid passing \mintinline{ocaml}{Nil} to \mintinline{ocaml}{as_atomic} to avoid error handling, by turning \mintinline{ocaml}{'a node} into a GADT indexed over it a type-level representation of its head constructor.
 Examples of this pattern can be found in the \Kcas~\cite{kcas} library by Vesa Karvonen.
