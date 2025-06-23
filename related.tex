@@ -9,7 +9,7 @@ The verified program is translated, manually or in an automated way, into a repr
 The user has to write specifications and prove them.
 
 The representation may be primitive, like Gallina for \Rocq.
-For pure programs, this is rather straightforward, \eg in \texttt{hs-to-coq}~\cite{DBLP:conf/cpp/Spector-Zabusky18}.
+For pure programs, \Xgabriel[this is rather straightforward]{I disagree, I believe that hs-to-coq is scientifically problematic as the translation is unsound for higher-order functions and infinite data.}, \eg in \texttt{hs-to-coq}~\cite{DBLP:conf/cpp/Spector-Zabusky18}.
 For imperative programs, this is more challenging.
 One solution is to use a monad, \eg in \texttt{coq-of-ocaml}~\cite{coq-of-ocaml}, but it does not support concurrency.
 
